@@ -17,12 +17,13 @@ public class StudioService {
 
 	private final StudioRepository studioRepository;
 
+	@Transactional(readOnly = true)
 	public List<StudioSearchResponse> searchStudios(String keyword) {
 		List<Studio> studios = studioRepository.findByNameContaining(keyword);
 
 		return studios.stream()
-			.map(StudioSearchResponse::of)
-			.collect(Collectors.toList());
+				.map(StudioSearchResponse::of)
+				.toList();
 	}
 
 	/**
