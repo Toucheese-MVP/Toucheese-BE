@@ -9,7 +9,10 @@ import com.toucheese.product.entity.Product;
 import com.toucheese.studio.entity.Studio;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -56,12 +59,14 @@ public class Reservation {
 	@JoinColumn(name = "reservation_id")
 	private List<ReservationProductAddOption> reservationProductAddOptions;
 
-	private String status;
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private ReservationStatus status;
 
 	@PrePersist
 	private void prePersist() {
 		if (this.status == null) {
-			this.status = "예약대기";
+			this.status = ReservationStatus.예약대기;
 		}
 	}
 
