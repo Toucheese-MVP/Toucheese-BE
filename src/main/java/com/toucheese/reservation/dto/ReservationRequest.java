@@ -1,9 +1,12 @@
 package com.toucheese.reservation.dto;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.toucheese.product.dto.ProductAddOptionRequest;
 import com.toucheese.product.entity.Product;
 import com.toucheese.reservation.entity.Reservation;
@@ -19,6 +22,7 @@ public record ReservationRequest(
 	String name,
 	String phone,
 	LocalDate createDate,
+	LocalTime createTime,
 	Integer personnel,
 	List<ProductAddOptionRequest> addOptions
 ) {
@@ -32,6 +36,7 @@ public record ReservationRequest(
 			.name(reservation.getName())
 			.phone(reservation.getPhone())
 			.createDate(reservation.getCreateDate())
+			.createTime(reservation.getCreateTime())
 			.personnel(reservation.getPersonnel())
 			.addOptions(reservation.getReservationProductAddOptions() != null ?
 				reservation.getReservationProductAddOptions().stream()

@@ -1,5 +1,6 @@
 package com.toucheese.reservation.service;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ReservationService {
 
 	private final ReservationRepository reservationRepository;
@@ -57,6 +57,7 @@ public class ReservationService {
 			reservationRequest.name(),
 			reservationRequest.phone(),
 			reservationRequest.createDate(),
+			reservationRequest.createTime(),
 			reservationRequest.personnel(),
 			reservationProductAddOptions
 		);

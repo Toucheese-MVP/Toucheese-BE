@@ -1,8 +1,10 @@
 package com.toucheese.reservation.entity;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.toucheese.product.entity.Product;
 import com.toucheese.studio.entity.Studio;
 
@@ -34,7 +36,11 @@ public class Reservation {
 
 	private String phone;
 
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	private LocalDate createDate;
+
+	@JsonFormat(pattern = "HH:mm", timezone = "Asia/Seoul")
+	private LocalTime createTime;
 
 	private Integer personnel;
 
@@ -55,19 +61,21 @@ public class Reservation {
 	@PrePersist
 	private void prePersist() {
 		if (this.status == null) {
-			this.status = "예약대기"; // 데이터 저장 전 기본 상태 설정
+			this.status = "예약대기";
 		}
 	}
 
-	public Reservation(Product product, Studio studio, Integer totalPrice, String name, String phone, LocalDate createDate, Integer personnel, List<ReservationProductAddOption> reservationProductAddOptions) {
+	public Reservation(Product product, Studio studio, Integer totalPrice, String name, String phone,
+		LocalDate createDate, LocalTime createTime, Integer personnel,
+		List<ReservationProductAddOption> reservationProductAddOptions) {
 		this.product = product;
 		this.studio = studio;
 		this.totalPrice = totalPrice;
 		this.name = name;
 		this.phone = phone;
 		this.createDate = createDate;
+		this.createTime = createTime.withSecond(0).withNano(0); // 초와 나노초 제거
 		this.personnel = personnel;
 		this.reservationProductAddOptions = reservationProductAddOptions;
 	}
-
 }
