@@ -22,11 +22,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class Reservation {
 
 	@Id
@@ -42,7 +46,7 @@ public class Reservation {
 	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	private LocalDate createDate;
 
-	@JsonFormat(pattern = "HH:mm", timezone = "Asia/Seoul")
+	@Column(name = "create_time", columnDefinition = "TIME(0)")
 	private LocalTime createTime;
 
 	private Integer personnel;
@@ -70,17 +74,4 @@ public class Reservation {
 		}
 	}
 
-	public Reservation(Product product, Studio studio, Integer totalPrice, String name, String phone,
-		LocalDate createDate, LocalTime createTime, Integer personnel,
-		List<ReservationProductAddOption> reservationProductAddOptions) {
-		this.product = product;
-		this.studio = studio;
-		this.totalPrice = totalPrice;
-		this.name = name;
-		this.phone = phone;
-		this.createDate = createDate;
-		this.createTime = createTime.withSecond(0).withNano(0); // 초와 나노초 제거
-		this.personnel = personnel;
-		this.reservationProductAddOptions = reservationProductAddOptions;
-	}
 }
