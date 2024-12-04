@@ -24,7 +24,7 @@ public class ReservationController {
 	private final ReservationService reservationService;
 	private final ProductService productService;
 
-	@PostMapping("")
+	@PostMapping()
 	@Operation(
 		summary = "예약 정보 저장 기능",
 		description = """

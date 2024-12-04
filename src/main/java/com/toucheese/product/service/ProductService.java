@@ -33,6 +33,7 @@ public class ProductService {
         return ProductDetailResponse.of(product);
     }
 
+    @Transactional(readOnly = true)
     public Product findProductById(Long productId) {
         return productRepository.findById(productId)
             .orElseThrow(() -> new ToucheeseBadRequestException("Product not found"));
@@ -44,6 +45,7 @@ public class ProductService {
      * @return 해당하는 productAddOption 객체
      * @throws ToucheeseBadRequestException 존재하지 않는 productAddOption에 접근할 때 발생
      */
+    @Transactional(readOnly = true)
     public ProductAddOption findProductAddOptionById(Long productAddOptionId) {
         return productAddOptionRepository.findById(productAddOptionId)
             .orElseThrow(() -> new ToucheeseBadRequestException("productAddOption not found"));
