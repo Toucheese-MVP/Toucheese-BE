@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.toucheese.product.service.ProductService;
 import com.toucheese.reservation.dto.ReservationRequest;
-import com.toucheese.reservation.entity.Reservation;
 import com.toucheese.reservation.service.ReservationService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,8 +68,8 @@ public class ReservationController {
 	public ResponseEntity<ReservationRequest> reservationCreate(
 		@Valid @RequestBody ReservationRequest reservationRequest) {
 
-		Reservation reservation = reservationService.createReservation(reservationRequest);
+		reservationService.createReservation(reservationRequest);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(ReservationRequest.of(reservation));
+		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 }
