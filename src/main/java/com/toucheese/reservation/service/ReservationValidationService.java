@@ -47,9 +47,6 @@ public class ReservationValidationService {
 		return reservationRequest.addOptions().stream()
 			.map(addOptionRequest -> {
 				ProductAddOption productAddOption = productService.findProductAddOptionById(addOptionRequest.id());
-				if (!productService.isValidProductAddOption(product, productAddOption)) {
-					throw new ToucheeseBadRequestException("Invalid AddOption for the selected product");
-				}
 				return new ReservationProductAddOption(productAddOption, addOptionRequest.addOptionPrice());
 			})
 			.collect(Collectors.toList());
