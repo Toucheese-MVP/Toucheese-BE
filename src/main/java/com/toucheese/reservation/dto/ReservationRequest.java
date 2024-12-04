@@ -2,12 +2,11 @@ package com.toucheese.reservation.dto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.toucheese.product.dto.ProductAddOptionRequest;
 import com.toucheese.reservation.entity.Reservation;
-
 
 import lombok.Builder;
 
@@ -36,8 +35,8 @@ public record ReservationRequest(
 			.personnel(reservation.getPersonnel())
 			.addOptions(reservation.getReservationProductAddOptions() != null ?
 				reservation.getReservationProductAddOptions().stream()
-					.map(option -> new ProductAddOptionRequest(option.getProductAddOption().getId(), option.getAddPrice()))
-					.collect(Collectors.toList()) : List.of())
+					.map(option -> new ProductAddOptionRequest(option.getId()))
+					.toList() : Collections.emptyList())
 			.build();
 	}
 

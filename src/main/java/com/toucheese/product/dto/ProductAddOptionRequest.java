@@ -6,13 +6,11 @@ import lombok.Builder;
 
 @Builder
 public record ProductAddOptionRequest(
-	Long id,
-	Integer addOptionPrice
+	Long id
 ) {
 	public static ProductAddOptionRequest of(ProductAddOption productAddOption) {
 		return ProductAddOptionRequest.builder()
 			.id(productAddOption.getId())
-			.addOptionPrice(productAddOption.getAddOptionPrice())
 			.build();
 	}
 }
