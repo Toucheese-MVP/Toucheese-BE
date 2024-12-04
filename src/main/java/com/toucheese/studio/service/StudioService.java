@@ -40,4 +40,9 @@ public class StudioService {
 		return StudioDetailResponse.of(studio);
 	}
 
+	public Studio findStudioById(Long studioId) {
+		return studioRepository.findById(studioId)
+			.orElseThrow(() -> new ToucheeseBadRequestException("Product not found"));
+	}
+
 }

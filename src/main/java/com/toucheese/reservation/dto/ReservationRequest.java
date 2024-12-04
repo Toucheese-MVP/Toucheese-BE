@@ -5,11 +5,9 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.toucheese.product.dto.ProductAddOptionRequest;
-import com.toucheese.product.entity.Product;
 import com.toucheese.reservation.entity.Reservation;
+
 
 import lombok.Builder;
 
@@ -45,10 +43,4 @@ public record ReservationRequest(
 			.build();
 	}
 
-	public boolean isValidAddOption(Product product) {
-		return addOptions.stream()
-			.allMatch(addOptionRequest ->
-				product.getProductAddOptions().stream()
-					.anyMatch(productAddOption -> productAddOption.getId().equals(addOptionRequest.id())));
-	}
 }
