@@ -1,5 +1,7 @@
 package com.toucheese.product.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,14 +42,11 @@ public class ProductService {
     }
 
     /**
-     * 상품에 해당하는 productAddOption을 조회한다.
-     * @param productAddOptionId productAddOption 아이디
-     * @return 해당하는 productAddOption 객체
-     * @throws ToucheeseBadRequestException 존재하지 않는 productAddOption에 접근할 때 발생
+     addOptionId와 product_id 맞는 productAddOptionId 매칭 후 반환
+     없을 경우 빈 List 반환
      */
     @Transactional(readOnly = true)
-    public ProductAddOption findProductAddOptionById(Long productAddOptionId) {
-        return productAddOptionRepository.findById(productAddOptionId)
-            .orElseThrow(() -> new ToucheeseBadRequestException("productAddOption not found"));
+    public List<ProductAddOption> findProductAddOptionsByProductIdAndAddOptionIds(Long productId, List<Long> addOptionIds) {
+        return productAddOptionRepository.findByProduct_IdAndAddOption_IdIn(productId, addOptionIds);
     }
 }

@@ -25,4 +25,8 @@ public class ProductAddOption {
 	@ManyToOne
 	@JoinColumn(name = "add_option_id", nullable = false)
 	private AddOption addOption;
+
+	@ManyToOne
+	@JoinColumn(name = "product_id", nullable = false)
+	private Product product;
 }
