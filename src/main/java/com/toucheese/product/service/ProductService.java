@@ -39,13 +39,13 @@ public class ProductService {
     }
 
     /**
-     * 상품에 해당하는 AddOption을 조회한다.
-     * @param addOptionId AddOption 아이디
-     * @return 해당하는 AddOption 객체
-     * @throws ToucheeseBadRequestException 존재하지 않는 AddOption에 접근할 때 발생
+     * 상품에 해당하는 productAddOption을 조회한다.
+     * @param productAddOptionId productAddOption 아이디
+     * @return 해당하는 productAddOption 객체
+     * @throws ToucheeseBadRequestException 존재하지 않는 productAddOption에 접근할 때 발생
      */
-    public ProductAddOption findProductAddOptionById(Long addOptionId) {
-        return productAddOptionRepository.findById(addOptionId)
-            .orElseThrow(() -> new ToucheeseBadRequestException("AddOption not found"));
+    public ProductAddOption findProductAddOptionById(Long productAddOptionId) {
+        return productAddOptionRepository.findById(productAddOptionId)
+            .orElseThrow(() -> new ToucheeseBadRequestException("productAddOption not found"));
     }
 }
