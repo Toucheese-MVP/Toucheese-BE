@@ -4,9 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import com.toucheese.product.dto.ProductAddOptionRequest;
 import com.toucheese.reservation.entity.Reservation;
+import com.toucheese.reservation.entity.ReservationProductAddOption;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
@@ -23,7 +24,7 @@ public record ReservationRequest(
 	LocalDate createDate,
 	LocalTime createTime,
 	Integer personnel,
-	List<ProductAddOptionRequest> addOptions
+	List<Long> addOptions
 ) {
 
 	public static ReservationRequest of(Reservation reservation) {
@@ -38,8 +39,8 @@ public record ReservationRequest(
 			.personnel(reservation.getPersonnel())
 			.addOptions(reservation.getReservationProductAddOptions() != null ?
 				reservation.getReservationProductAddOptions().stream()
-					.map(option -> new ProductAddOptionRequest(option.getId()))
-					.toList() : Collections.emptyList())
+					.map(ReservationProductAddOption::getId)
+					.collect(Collectors.toList()) : Collections.emptyList())
 			.build();
 	}
 }
