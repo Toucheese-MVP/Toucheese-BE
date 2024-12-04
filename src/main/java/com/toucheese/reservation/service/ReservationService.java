@@ -28,7 +28,7 @@ public class ReservationService {
 	private final ReservationValidationService reservationValidationService;
 
 	@Transactional
-	public Reservation createReservation(ReservationRequest reservationRequest) {
+	public void createReservation(ReservationRequest reservationRequest) {
 		Product product = productService.findProductById(reservationRequest.productId());
 
 		Studio studio = studioService.findStudioById(reservationRequest.studioId());
@@ -36,8 +36,8 @@ public class ReservationService {
 		reservationValidationService.validateAddOptionsForProduct(reservationRequest, product);
 
 		List<ReservationProductAddOption> reservationProductAddOptions = reservationRequest.addOptions().stream()
-			.map(addOptionRequest -> {
-				ProductAddOption productAddOption = productService.findProductAddOptionById(addOptionRequest.id());
+			.map(productAddOptionRequest -> {
+				ProductAddOption productAddOption = productService.findProductAddOptionById(productAddOptionRequest.id());
 				return new ReservationProductAddOption(productAddOption, productAddOption.getAddOptionPrice());
 			})
 			.collect(Collectors.toList());
@@ -54,6 +54,6 @@ public class ReservationService {
 			.reservationProductAddOptions(reservationProductAddOptions)
 			.build();
 
-		return reservationRepository.save(reservation);
+		reservationRepository.save(reservation);
 	}
 }
