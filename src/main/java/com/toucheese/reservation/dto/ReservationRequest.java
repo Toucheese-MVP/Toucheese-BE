@@ -13,7 +13,6 @@ import lombok.Builder;
 
 @Builder
 public record ReservationRequest(
-	Long id,
 	Long productId,
 	Long studioId,
 	Integer totalPrice,
@@ -27,7 +26,6 @@ public record ReservationRequest(
 
 	public static ReservationRequest of(Reservation reservation) {
 		return ReservationRequest.builder()
-			.id(reservation.getId())
 			.productId(reservation.getProduct().getId())
 			.studioId(reservation.getStudio().getId())
 			.totalPrice(reservation.getTotalPrice())
