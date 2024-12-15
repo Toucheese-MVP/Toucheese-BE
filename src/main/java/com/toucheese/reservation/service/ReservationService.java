@@ -1,19 +1,20 @@
 package com.toucheese.reservation.service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.toucheese.product.entity.Product;
 import com.toucheese.product.entity.ProductAddOption;
 import com.toucheese.product.service.ProductService;
-import com.toucheese.reservation.dto.ReservationRequest;
+import com.toucheese.cart.entity.Cart;
 import com.toucheese.reservation.entity.Reservation;
 import com.toucheese.reservation.entity.ReservationProductAddOption;
+import com.toucheese.reservation.entity.ReservationStatus;
 import com.toucheese.reservation.repository.ReservationRepository;
-import com.toucheese.studio.entity.Studio;
-import com.toucheese.studio.service.StudioService;
+import com.toucheese.global.util.CsvUtils;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,36 +24,38 @@ import lombok.RequiredArgsConstructor;
 public class ReservationService {
 
 	private final ReservationRepository reservationRepository;
-	private final StudioService studioService;
 	private final ProductService productService;
 
 	@Transactional
-	public void createReservation(ReservationRequest reservationRequest) {
-		Product product = productService.findProductById(reservationRequest.productId());
+	public void createReservationsFromCarts(List<Cart> carts) {
+		List<Reservation> reservations = carts.stream().map(cart -> {
+			List<Long> addOptionIds = CsvUtils.fromCsv(cart.getAddOptions());
 
-		Studio studio = studioService.findStudioById(reservationRequest.studioId());
+			// ProductAddOption 리스트 조회
+			List<ProductAddOption> productAddOptions = productService.findProductAddOptionsByProductIdAndAddOptionIds(
+				cart.getProduct().getId(), addOptionIds
+			);
 
-		List<ProductAddOption> productAddOptions = productService.findProductAddOptionsByProductIdAndAddOptionIds(
-			reservationRequest.productId(),
-			reservationRequest.addOptions()
-		);
+			// ReservationProductAddOption 생성
+			List<ReservationProductAddOption> reservationProductAddOptions = productAddOptions.stream()
+				.map(productAddOption -> new ReservationProductAddOption(productAddOption, productAddOption.getAddOptionPrice()))
+				.collect(Collectors.toList());
 
-		List<ReservationProductAddOption> reservationProductAddOptions = productAddOptions.stream()
-			.map(option -> new ReservationProductAddOption(option, option.getAddOptionPrice()))
-			.collect(Collectors.toList());
+			// Reservation 생성
+			return Reservation.builder()
+				.product(cart.getProduct())
+				.studio(cart.getStudio())
+				.member(cart.getMember())
+				.totalPrice(cart.getTotalPrice())
+				.createDate(cart.getCreateDate())
+				.createTime(cart.getCreateTime())
+				.personnel(cart.getPersonnel())
+				.reservationProductAddOptions(reservationProductAddOptions)
+				.status(ReservationStatus.예약접수)
+				.reservationCompletedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+				.build();
+		}).collect(Collectors.toList());
 
-		Reservation reservation = Reservation.builder()
-			.product(product)
-			.studio(studio)
-			.totalPrice(reservationRequest.totalPrice())
-			.name(reservationRequest.name())
-			.phone(reservationRequest.phone())
-			.createDate(reservationRequest.createDate())
-			.createTime(reservationRequest.createTime())
-			.personnel(reservationRequest.personnel())
-			.reservationProductAddOptions(reservationProductAddOptions)
-			.build();
-
-		reservationRepository.save(reservation);
+		reservationRepository.saveAll(reservations);
 	}
 }
