@@ -12,7 +12,8 @@ public record QuestionResponse (
         String title,
         String content,
         LocalDate createDate,
-        AnswerStatus answerStatus
+        AnswerStatus answerStatus,
+        String authorName
 ){
     public static QuestionResponse of(Question question) {
         return QuestionResponse.builder()
@@ -21,6 +22,7 @@ public record QuestionResponse (
                 .content(question.getContent())
                 .createDate(question.getCreateDate())
                 .answerStatus(question.getAnswerStatus())
+                .authorName(question.getMember().getName())
                 .build();
     }
 }

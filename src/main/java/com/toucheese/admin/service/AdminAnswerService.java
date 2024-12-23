@@ -2,6 +2,7 @@ package com.toucheese.admin.service;
 
 import com.toucheese.global.exception.ToucheeseBadRequestException;
 import com.toucheese.global.util.PageUtils;
+import com.toucheese.question.dto.AnswerRequest;
 import com.toucheese.question.dto.AnswerResponse;
 import com.toucheese.question.dto.QuestionResponse;
 import com.toucheese.question.entity.Answer;
@@ -46,13 +47,14 @@ public class AdminAnswerService {
     }
 
     @Transactional
-    public void addAnswer(Long questionId, String content) {
+    public void addAnswer(Long questionId, String title, String content) {
 
         Question question = questionReadService.findQuestionById(questionId);
 
         Answer answer = answerRepository.save(
                 Answer.builder()
                 .question(question)
+                .title(title)
                 .content(content)
                 .createDate(LocalDate.now())
                 .build()
@@ -63,9 +65,9 @@ public class AdminAnswerService {
 
     // 답변 수정
     @Transactional
-    public void updateAnswer(Long questionId, String content) {
+    public void updateAnswer(Long questionId, AnswerRequest answerRequest) {
         Answer answer = findAnswerByQuestionId(questionId);
-        answer.updateAnswer(content);
+        answer.updateAnswer(answerRequest.title(), answerRequest.content());
     }
 
     // 답변 삭제
