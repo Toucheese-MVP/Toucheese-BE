@@ -1,28 +1,16 @@
 package com.toucheese.member.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.toucheese.cart.entity.Cart;
 import com.toucheese.member.dto.AuthProvider;
 import com.toucheese.member.dto.MemberFirstLoginUpdateRequest;
 import com.toucheese.question.entity.Question;
 import com.toucheese.reservation.entity.Reservation;
+import com.toucheese.review.entity.Review;
+import jakarta.persistence.*;
+import lombok.*;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -66,6 +54,10 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Question> questions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<Review> reviews = new ArrayList<>();
 
 	public void firstLoginUpdate(MemberFirstLoginUpdateRequest request) {
 		this.name = request.name();
