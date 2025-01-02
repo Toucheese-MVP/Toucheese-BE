@@ -2,12 +2,25 @@ package com.toucheese.member.controller;
 
 import java.security.Principal;
 
-import com.toucheese.global.util.PrincipalUtils;
-import com.toucheese.member.dto.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.toucheese.global.data.ApiResponse;
+import com.toucheese.global.util.PrincipalUtils;
+import com.toucheese.member.dto.FindEmailRequest;
+import com.toucheese.member.dto.LoginRequest;
+import com.toucheese.member.dto.LoginResponse;
+import com.toucheese.member.dto.MemberFirstLoginUpdateRequest;
+import com.toucheese.member.dto.MemberResponse;
+import com.toucheese.member.dto.MemberTokenResponse;
+import com.toucheese.member.dto.ResetPasswordRequest;
+import com.toucheese.member.dto.SignupRequest;
 import com.toucheese.member.service.MemberService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,5 +65,37 @@ public class MemberController {
         return ApiResponse.getObjectSuccess(
                 MemberResponse.of(memberService.findMemberById(memberId))
         );
+    }
+
+    @PostMapping("/signup")
+    @Operation(summary = "회원 가입")
+    public ResponseEntity<?> signup(@RequestBody @Valid SignupRequest signupRequest) {
+
+        memberService.createSignup(signupRequest);
+        return ApiResponse.createdSuccess("회원 가입이 완료되었습니다.");
+    }
+
+    @DeleteMapping
+    @Operation(summary = "회원 탈퇴")
+    public ResponseEntity<?> deleteMember(Principal principal) {
+        Long memberId = PrincipalUtils.extractMemberId(principal);
+
+        memberService.deleteMember(memberId);
+        return ApiResponse.deletedSuccess("회원 탈퇴가 완료되었습니다.");
+    }
+
+    @GetMapping("/email")
+    @Operation(summary = "이메일 찾기")
+    public ResponseEntity<String> findEmail(@RequestBody @Valid FindEmailRequest findEmailRequest) {
+
+        String email = memberService.findEmail(findEmailRequest);
+        return ApiResponse.getObjectSuccess(email);
+    }
+
+    @PutMapping("/password")
+    @Operation(summary = "비밀번호 변경")
+    public ResponseEntity<?> resetPassword(@RequestBody @Valid ResetPasswordRequest resetPasswordRequest) {
+        memberService.resetPassword(resetPasswordRequest);
+        return ApiResponse.updatedSuccess("비밀번호가 변경되었습니다.");
     }
 }
