@@ -25,7 +25,7 @@ jobs:
       # application-secret 파일 생성
       - name: Decode application-secret
         run: |
-          echo "${{ secrets.APPLICATION_SECRET_BASE64 }}" | base64 -d > ./src/main/resources/application-secret.yml
+          echo "${{ secrets.APPLICATION_SECRET }}" | base64 -d > ./src/main/resources/application-secret.yml
 
       # Docker Build 진행 후 Docker hub 로 Push
       - name: Build and Push the Docker image
