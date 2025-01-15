@@ -1,4 +1,3 @@
-LABEL authors="minseonik"
 FROM eclipse-temurin:17 as build
 
 WORKDIR /app
