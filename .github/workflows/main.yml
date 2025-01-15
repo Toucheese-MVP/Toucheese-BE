@@ -1,0 +1,49 @@
+name: Docker Image Delivery
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deliver:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      # 이미지 태그 설정
+      - name: Set Image Tag
+        id: image-tag
+        run: echo "TAG=$(date +%s)-ci" >> "$GITHUB_OUTPUT"
+
+      # Docker Hub 로그인
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # application-secret 파일 생성
+      - name: Decode application-secret
+        run: |
+          echo "${{ secrets.APPLICATION_SECRET_BASE64 }}" | base64 -d > ./src/main/resources/application-secret.yml
+
+      # Docker Build 진행 후 Docker hub 로 Push
+      - name: Build and Push the Docker image
+        env:
+          TAG: ${{ steps.image-tag.outputs.TAG }}
+        run: |
+          docker buildx create --use
+          docker buildx build --platform linux/amd64 \
+            --build-arg APPLICATION_SECRET_FILE=application-secret \
+            --tag "toucheeseteam2/toucheese-ios:$TAG" --push .
+
+      # latest 태그로 덧붙여서 푸시하기
+      - name: Tag Image as latest
+        env:
+          TAG: ${{ steps.image-tag.outputs.TAG }}
+        run: |
+          docker pull "toucheeseteam2/toucheese-ios:$TAG"
+          docker tag "toucheeseteam2/toucheese-ios:$TAG" \
+          "toucheeseteam2/toucheese-ios:latest"
+      - name: Push latest
+        run: docker push "toucheeseteam2/toucheese-ios:latest"
