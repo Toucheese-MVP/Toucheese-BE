@@ -57,5 +57,4 @@ public class AuthController {
 			socalLoginCombinedResponse.socialLoginResponse(),
 			socalLoginCombinedResponse.accessToken());
 	}
-
 }
