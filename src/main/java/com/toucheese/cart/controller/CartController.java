@@ -172,4 +172,33 @@ public class CartController {
 		CombinedResponse combinedResponse = new CombinedResponse(checkoutCartItems, memberContactInfo);
 		return ApiResponse.getObjectSuccess(combinedResponse);
 	}
+
+	@Operation(summary = "장바구니 없이 예약하기", description = """
+			
+			장바구니 ID 없이 직접 생성합니다.
+			
+			'''json{
+				"productId": 상품 id
+			 	"studioId": 스튜디오 id
+			 	"totalPrice": 상품 + 추가 상품의 총 금액
+			  	"createDate": 예약 날짜 (2024-12-11)
+			  	"createTime": 예약 시간 (09:30)
+			  	"personnel": 예약 인원 수
+			  	"addOptions": 추가 옵션에 대한 id값[
+					1, 2, 3
+			  	]
+			}
+			
+			""")
+
+	@PostMapping("/")
+	public ResponseEntity<?> directReservation(
+			@Valid @RequestBody
+			CartRequest cartRequest, Principal principal
+	){
+		Long memberId = PrincipalUtils.extractMemberId(principal);
+		cartService.createReservationFromCartRequest(cartRequest, memberId);
+
+		return ApiResponse.createdSuccess("예약이 생성되었습니다.");
+	}
 }

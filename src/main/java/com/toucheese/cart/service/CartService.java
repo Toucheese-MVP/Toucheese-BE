@@ -200,4 +200,6 @@ public class CartService {
 			}).toList();
 	}
 
+	public void createReservationFromCartRequest(CartRequest cartRequest, Long memberId) {
+	}
 }
