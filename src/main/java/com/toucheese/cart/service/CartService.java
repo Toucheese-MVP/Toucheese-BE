@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.toucheese.reservation.entity.Reservation;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -200,6 +201,13 @@ public class CartService {
 			}).toList();
 	}
 
+	@Transactional
 	public void createReservationFromCartRequest(CartRequest cartRequest, Long memberId) {
+		Product product = productService.findProductById(cartRequest.productId());
+		Studio studio = studioService.findStudioById(cartRequest.studioId());
+		Member member = memberService.findMemberById(memberId);
+
+		// 예약 생성 로직
+		Reservation reservation = new Reservation(); // 예약 객체 생성
 	}
 }
