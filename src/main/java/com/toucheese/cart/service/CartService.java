@@ -1,11 +1,14 @@
 package com.toucheese.cart.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.toucheese.reservation.entity.Reservation;
+import com.toucheese.reservation.entity.ReservationProductAddOption;
+import com.toucheese.reservation.entity.ReservationStatus;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -199,15 +202,5 @@ public class CartService {
 					productAddOption.getAddOptionPrice()
 				);
 			}).toList();
-	}
-
-	@Transactional
-	public void createReservationFromCartRequest(CartRequest cartRequest, Long memberId) {
-		Product product = productService.findProductById(cartRequest.productId());
-		Studio studio = studioService.findStudioById(cartRequest.studioId());
-		Member member = memberService.findMemberById(memberId);
-
-		// 예약 생성 로직
-		Reservation reservation = new Reservation(); // 예약 객체 생성
 	}
 }

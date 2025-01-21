@@ -2,6 +2,7 @@ package com.toucheese.reservation.controller;
 
 import java.security.Principal;
 
+import com.toucheese.reservation.dto.ReservationRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -81,4 +82,28 @@ public class ReservationController {
 		return ApiResponse.updatedSuccess("예약 상태를 성공적으로 업데이트했습니다.");
 	}
 
+	@Operation(
+			summary = "즉시 예약 기능",
+			description = """
+        사용자가 직접 예약 정보를 입력하여 즉시 예약을 생성합니다.
+        ```json
+        {
+            "productId": 1,
+            "studioId": 1,
+            "totalPrice": 10000,
+            "createDate": "2025-01-21",
+            "createTime": "19:00",
+            "personnel": 2,
+            "addOptions": [1, 2]
+        }
+        ```
+    """
+	)
+	@PostMapping("/instant")
+	public ResponseEntity<?> createInstantReservation(Principal principal, @RequestBody ReservationRequest reservationRequest) {
+		Long memberId = PrincipalUtils.extractMemberId(principal);
+
+		reservationService.createInstantReservation(memberId, reservationRequest);
+		return ApiResponse.createdSuccess("예약접수가 완료되었습니다.");
+	}
 }
