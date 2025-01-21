@@ -3,9 +3,11 @@ package com.toucheese.reservation.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.toucheese.cart.dto.CartRequest;
 import com.toucheese.member.entity.Member;
 import com.toucheese.product.entity.Product;
 import com.toucheese.reservation.dto.ReservationUpdateRequest;
@@ -23,14 +25,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Entity @Getter
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@Entity @Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class Reservation {
@@ -71,6 +69,7 @@ public class Reservation {
 
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private LocalDateTime reservationCompletedAt;
+
 
 	public void updateStatus(ReservationStatus newStatus) {
 		this.status = newStatus;
