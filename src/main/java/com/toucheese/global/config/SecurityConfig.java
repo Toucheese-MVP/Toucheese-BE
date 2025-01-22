@@ -25,55 +25,57 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-	@Bean
-	SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-		http
-			.csrf(AbstractHttpConfigurer::disable)
-			.cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 추가
-			.exceptionHandling(config -> config
-					.authenticationEntryPoint(customAuthenticationEntryPoint)
-			)
-			.authorizeHttpRequests(requests ->
-				requests.requestMatchers(HttpMethod.GET, "/v1/concepts/**").permitAll()
-					.requestMatchers(HttpMethod.GET, "/v1/studios/**").permitAll()
-					.requestMatchers(HttpMethod.GET, "/v1/products/**").permitAll()
-					.requestMatchers(HttpMethod.GET, "/v1/reviews/**").permitAll()
-					.requestMatchers(HttpMethod.GET, "/v1/members/email/**").permitAll()
-					.requestMatchers(HttpMethod.GET, "/v1/members/password/**").permitAll()
-					.requestMatchers(HttpMethod.PUT, "/v1/members/password/reset").permitAll()
-					.requestMatchers(HttpMethod.POST, "/v1/members/**").permitAll()
-					.requestMatchers(HttpMethod.POST, "/v1/messages/**").permitAll()
-					.requestMatchers(HttpMethod.POST, "/v1/tokens/reissue").permitAll()
-					.requestMatchers(HttpMethod.GET, "/v1/auth/**").permitAll()
-					.requestMatchers(HttpMethod.POST, "/v1/auth/**").permitAll()
-					.requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**",
-						"/v3/api-docs/**").permitAll()
-					.requestMatchers("/v1/admin/**").hasAuthority("ADMIN")
-					.anyRequest().authenticated()
-			)
-			.sessionManagement(sessionManagement ->
-				sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			)
-			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    @Bean
+    SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 추가
+                .exceptionHandling(config -> config
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                )
+                .authorizeHttpRequests(requests ->
+                        requests.requestMatchers(HttpMethod.GET, "/v1/concepts/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/v1/studios/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/v1/products/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/v1/reviews/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/v1/members/email/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/v1/members/password/**").permitAll()
+                                .requestMatchers(HttpMethod.PUT, "/v1/members/password/reset").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/v1/members/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/v1/messages/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/v1/tokens/reissue").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/v1/auth/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/v1/auth/**").permitAll()
+                                .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**",
+                                        "/v3/api-docs/**").permitAll()
+                                .requestMatchers("/v1/admin/**").hasAuthority("ADMIN")
+                                .anyRequest().authenticated()
+                )
+                .sessionManagement(sessionManagement ->
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-		return http.build();
-	}
+        return http.build();
+    }
 
-	@Bean
-	public CorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.addAllowedOrigin("https://www.toucheese-macwin.store");
-		configuration.addAllowedOrigin("http://localhost:3000");
-		configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
-		configuration.addAllowedHeader("*"); // 모든 헤더 허용
-		configuration.addExposedHeader("Authorization"); // Authorization 헤더 접근 허용
-		configuration.setAllowCredentials(true); // 인증 정보 허용
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("https://www.toucheese-macwin.store");
+        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
+        configuration.addAllowedHeader("*"); // 모든 헤더 허용
+        configuration.addExposedHeader("Authorization"); // Authorization 헤더 접근 허용
+        configuration.setAllowCredentials(true); // 인증 정보 허용
 
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", configuration);
-		return source;
-	}
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+
 }
