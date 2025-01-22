@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableFeignClients(basePackages = "com.toucheese.member.apple.config")
+@EnableFeignClients(basePackages = "com.toucheese.member.client")
 @EnableScheduling
 public class ToucheeseApplication {
 
