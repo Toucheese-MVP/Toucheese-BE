@@ -26,8 +26,9 @@ public class ReservationProductAddOption {
 	@JoinColumn(name = "product_add_option_id", nullable = false)
 	private ProductAddOption productAddOption;
 
-	public ReservationProductAddOption(ProductAddOption productAddOption, Integer addPrice) {
-		this.productAddOption = productAddOption;
-		this.addPrice = addPrice;
+
+		public ReservationProductAddOption(ProductAddOption productAddOption, Integer addPrice) {
+			this.productAddOption = productAddOption;
+			this.addPrice = addPrice;
 	}
 }
