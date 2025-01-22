@@ -2,6 +2,7 @@ buildscript {
 	ext {
 		queryDslVersion = "5.0.0"
 	}
+
 }
 
 plugins {
@@ -27,6 +28,10 @@ configurations {
 
 repositories {
 	mavenCentral()
+}
+
+ext {
+	set('springCloudVersion', "2023.0.5")
 }
 
 dependencies {
@@ -80,7 +85,12 @@ dependencies {
 
 	// webflux
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// openfeign
+	implementation platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 }
+
 
 // QueryDSL Setting
 def generated = 'src/main/generated'

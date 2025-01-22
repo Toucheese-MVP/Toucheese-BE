@@ -1,10 +1,16 @@
 package com.toucheese.global.util;
 
+import java.nio.charset.StandardCharsets;
+import java.security.PublicKey;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 import javax.crypto.SecretKey;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toucheese.member.entity.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -114,6 +120,24 @@ public class JwtTokenProvider {
         String role = claims.get("role", String.class);
         User principal = new User(claims.getSubject(), "",  Collections.singleton(() -> role));
         return new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
+    }
+
+
+    public Map<String, String> parseHeaders(String token) throws JsonProcessingException {
+        String header = token.split("\\.")[0];
+        return new ObjectMapper().readValue(decodeHeader(header), Map.class);
+    }
+
+    public String decodeHeader(String token) {
+        return new String(Base64.getDecoder().decode(token), StandardCharsets.UTF_8);
+    }
+
+    public Claims getTokenClaims(String token, PublicKey publicKey) {
+        return Jwts.parser()
+                .verifyWith(publicKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
 }

@@ -2,21 +2,13 @@ package com.toucheese.member.service;
 
 import java.security.Principal;
 
+import com.toucheese.member.dto.AppleMember;
+import com.toucheese.member.dto.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.toucheese.global.exception.ToucheeseBadRequestException;
 import com.toucheese.global.util.PrincipalUtils;
-import com.toucheese.member.dto.AuthProvider;
-import com.toucheese.member.dto.FindEmailRequest;
-import com.toucheese.member.dto.KakaoMember;
-import com.toucheese.member.dto.LoginRequest;
-import com.toucheese.member.dto.MemberContactInfoResponse;
-import com.toucheese.member.dto.MemberFirstLoginUpdateRequest;
-import com.toucheese.member.dto.MemberTokenResponse;
-import com.toucheese.member.dto.ResetPasswordRequest;
-import com.toucheese.member.dto.SignupRequest;
-import com.toucheese.member.dto.TokenDTO;
 import com.toucheese.member.entity.Member;
 import com.toucheese.member.entity.Role;
 import com.toucheese.member.repository.MemberRepository;
@@ -104,6 +96,31 @@ public class MemberService {
 			.build();
 		return memberRepository.save(member);
 	}
+
+	/**
+	 * 애플 사용자 정보를 기반으로 회원 조회 또는 생성
+	 * @param appleMember 카카오 사용자 정보
+	 * @return 회원 엔티티
+	 */
+	public Member findOrCreateMember(AppleMember appleMember) {
+		return memberRepository.findByEmail(appleMember.email())
+				.orElseGet(() -> createMember(appleMember));
+	}
+
+	private Member createMember(AppleMember appleMember) {
+		Member member = Member.builder()
+				.email(appleMember.email())
+				.name(appleMember.name())
+				.password(null) // 소셜 로그인 사용자는 비밀번호 없음
+				.role(Role.USER)
+				.authProvider(AuthProvider.APPLE)
+				.isFirstLogin(true) // 처음 생성되는 경우 true로 설정
+				.build();
+		return memberRepository.save(member);
+	}
+
+
+
 
 	@Transactional
 	public void memberFirstLoginUpdate(MemberFirstLoginUpdateRequest request, Principal principal) {
