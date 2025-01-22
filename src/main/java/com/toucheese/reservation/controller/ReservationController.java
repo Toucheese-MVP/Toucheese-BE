@@ -83,7 +83,7 @@ public class ReservationController {
 	}
 
 	@Operation(
-			summary = "즉시 예약 기능",
+			summary = "즉시 예약 기능(iOS)",
 			description = """
         사용자가 직접 예약 정보를 입력하여 즉시 예약을 생성합니다.
         ```json
