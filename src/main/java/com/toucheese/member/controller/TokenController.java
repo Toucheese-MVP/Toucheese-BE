@@ -22,11 +22,9 @@ import org.springframework.web.bind.annotation.*;
 public class TokenController {
 
     private final TokenService tokenService;
-    private final TokenUtils tokenUtils;
 
     /**
      * 토큰 재발급을 처리하는 API
-     * @param request AccessToken 추출을 위한 요청 객체
      * @param reissueRequest 로그인 검증을 위한 RefreshToken, DeviceId 정보
      * @return 재발급 된 AccessToken 및 로그인 정보
      */

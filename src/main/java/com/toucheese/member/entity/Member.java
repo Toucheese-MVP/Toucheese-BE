@@ -53,6 +53,9 @@ public class Member {
     @Column(nullable = false)
     private AuthProvider authProvider;
 
+    @Column(unique = true)
+    private String socialId;
+
     @Column(nullable = false)
     private boolean isFirstLogin;
 
