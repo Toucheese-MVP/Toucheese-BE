@@ -26,7 +26,6 @@ public class TokenService {
 
     /**
      * 토큰 재발급을 위한 메서드
-     * @param accessToken 접근 토큰
      * @param reissueRequest 재발급을 위한 검증 정보
      * @return 재발급 된 AccessToken 및 로그인 정보
      */
@@ -46,6 +45,7 @@ public class TokenService {
 
         return MemberTokenResponse.builder()
                 .memberId(member.getId())
+                .email(member.getEmail())
                 .name(member.getName())
                 .tokenDTO(
                         TokenDTO.builder()
