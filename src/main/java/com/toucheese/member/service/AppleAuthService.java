@@ -47,7 +47,6 @@ public class AppleAuthService {
         TokenDTO tokenDTO = tokenService.loginMemberToken(member, deviceId);
 
         return new SocalLoginCombinedResponse(SocialLoginResponse.from(member, tokenDTO), tokenDTO.accessToken());
-
     }
 
     public Mono<AppleMember> getAppleMemberInfo(String identityToken) throws
@@ -56,11 +55,11 @@ public class AppleAuthService {
         Map<String, String> headers = jwtTokenProvider.parseHeaders(identityToken);
         PublicKey publicKey = applePublicKeyGenerator.generatePublicKey(headers, getAppleAuthPublicKey());
         Claims claims = jwtTokenProvider.getTokenClaims(identityToken, publicKey);
+
         return Mono.just(new AppleMember(
-                claims.getSubject(),
+                claims.getSubject(), // Apple userID
                 (String) claims.get("name.firstName") + claims.get("name.lastName"),
                 (String) claims.get("email")
         ));
-
     }
 }

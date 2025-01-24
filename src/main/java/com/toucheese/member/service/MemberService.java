@@ -103,7 +103,7 @@ public class MemberService {
 	 * @return 회원 엔티티
 	 */
 	public Member findOrCreateMember(AppleMember appleMember) {
-		return memberRepository.findByEmail(appleMember.email())
+		return memberRepository.findBySocialId(appleMember.id())
 				.orElseGet(() -> createMember(appleMember));
 	}
 
@@ -114,6 +114,7 @@ public class MemberService {
 				.password(null) // 소셜 로그인 사용자는 비밀번호 없음
 				.role(Role.USER)
 				.authProvider(AuthProvider.APPLE)
+				.socialId(appleMember.id()) // 애플의 고유 userID
 				.isFirstLogin(true) // 처음 생성되는 경우 true로 설정
 				.build();
 		return memberRepository.save(member);
