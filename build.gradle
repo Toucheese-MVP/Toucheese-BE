@@ -44,6 +44,9 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
+	// openfeign
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
 	// Spring Cloud
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
