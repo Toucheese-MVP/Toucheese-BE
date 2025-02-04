@@ -1,10 +1,8 @@
 package com.toucheese.question.service;
 
 import com.toucheese.global.exception.ToucheeseBadRequestException;
-import com.toucheese.global.exception.ToucheeseUnAuthorizedException;
 import com.toucheese.global.util.PrincipalUtils;
 import com.toucheese.member.entity.Member;
-import com.toucheese.member.repository.MemberRepository;
 import com.toucheese.member.service.MemberService;
 import com.toucheese.question.entity.Question;
 import com.toucheese.question.repository.QuestionRepository;

@@ -1,9 +1,15 @@
 package com.toucheese.member.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.toucheese.global.data.ErrorResponse;
 import com.toucheese.member.dto.AppleAuthRequest;
 import com.toucheese.member.service.AppleAuthService;
 import com.toucheese.member.dto.*;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.toucheese.global.data.ApiResponse;
+import com.toucheese.global.data.SuccessResponse;
 import com.toucheese.member.service.KakaoAuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,7 +52,7 @@ public class AuthController {
 	public ResponseEntity<SocialLoginResponse> kakaoLogin(@Valid @RequestBody SocialLoginRequest socialLoginRequest) {
 		SocalLoginCombinedResponse socalLoginCombinedResponse = kakaoAuthService.handleKakaoLogin(socialLoginRequest);
 
-		return ApiResponse.accessTokenResponse(
+		return SuccessResponse.accessTokenResponse(
 			socalLoginCombinedResponse.socialLoginResponse(),
 			socalLoginCombinedResponse.accessToken());
 	}
@@ -59,7 +65,7 @@ public class AuthController {
 
 		SocalLoginCombinedResponse socalLoginCombinedResponse = kakaoAuthService.handleKakaoLogin(socialLoginRequest);
 
-		return ApiResponse.accessTokenResponse(
+		return SuccessResponse.accessTokenResponse(
 			socalLoginCombinedResponse.socialLoginResponse(),
 			socalLoginCombinedResponse.accessToken());
 	}
@@ -69,16 +75,47 @@ public class AuthController {
 	 * @param appleAuthRequest 클라이언트에서 전달된 애플 토큰 정보
 	 * @return 사용자 정보 및 JWT
 	 */
-	@Operation(summary = "애플 로그인 처리", description = """
-	애플 OAuth 인증 후 전달받은 id Token으로 사용자 정보를 추출후 사용자 정보와 JWT 토큰 발급하여 반환합니다. \n
-	JWT Access Token은 Response Header로 반환합니다.""")
-	@PostMapping("/apple")
+    @Operation(
+            summary = "애플 로그인 처리",
+            description = """
+    애플 OAuth 인증 후 전달받은 id Token으로 사용자 정보를 추출후 사용자 정보와 JWT 토큰 발급하여 반환합니다. \n
+    JWT Access Token은 Response Header로 반환합니다."""
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "[Apple Login] 로그인 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SocialLoginResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "4008",
+                    description = "[Apple Login] ID 토큰이 유효하지 않습니다. (statusCode 는 400 입니다)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4008,\n    \"message\": \"ID 토큰이 유효하지 않습니다.\"\n  }\n}")
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "4009",
+                    description = "[Apple Login] IdToken 헤더 파싱에 실패했습니다. (statusCode 는 400 입니다)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4009,\n    \"message\": \"IdToken 헤더 파싱에 실패했습니다.\"\n  }\n}")
+                    )
+            )
+    })
+    @PostMapping("/apple")
 	public ResponseEntity<SocialLoginResponse> appleLogin(@Valid @RequestBody AppleAuthRequest appleAuthRequest)
 			throws AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException
 	{
 		SocalLoginCombinedResponse socalLoginCombinedResponse = appleAuthService.handleAppleLogin(appleAuthRequest);
 
-		return ApiResponse.accessTokenResponse(
+		return SuccessResponse.accessTokenResponse(
 				socalLoginCombinedResponse.socialLoginResponse(),
 				socalLoginCombinedResponse.accessToken());
 	}

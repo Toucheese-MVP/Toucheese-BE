@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.toucheese.global.data.ApiResponse;
+import com.toucheese.global.data.SuccessResponse;
 import com.toucheese.global.util.PrincipalUtils;
 import com.toucheese.member.dto.FindEmailRequest;
 import com.toucheese.member.dto.LoginRequest;
@@ -45,7 +45,7 @@ public class MemberController {
     @Operation(summary = "회원 로그인", description = "email, password로 로그인 합니다.")
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
         MemberTokenResponse memberTokenResponse = memberService.login(loginRequest);
-        return ApiResponse.accessTokenResponse(
+        return SuccessResponse.accessTokenResponse(
                 LoginResponse.of(memberTokenResponse),
                 memberTokenResponse.tokenDTO().accessToken()
         );
@@ -55,14 +55,14 @@ public class MemberController {
     @Operation(summary = "첫 로그인 회원 정보 변경")
     public ResponseEntity<?> memberFirstLoginUpdate(@RequestBody @Valid MemberFirstLoginUpdateRequest request, Principal principal) {
         memberService.memberFirstLoginUpdate(request, principal);
-        return ApiResponse.updatedSuccess("회원 정보를 성공적으로 업데이트했습니다.");
+        return SuccessResponse.updatedSuccess("회원 정보를 성공적으로 업데이트했습니다.");
     }
 
     @GetMapping
     @Operation(summary = "내 정보 불러오기")
     public ResponseEntity<MemberResponse> getMemberInfo(Principal principal) {
         Long memberId = PrincipalUtils.extractMemberId(principal);
-        return ApiResponse.getObjectSuccess(
+        return SuccessResponse.getObjectSuccess(
                 MemberResponse.of(memberService.findMemberById(memberId))
         );
     }
@@ -72,7 +72,7 @@ public class MemberController {
     public ResponseEntity<?> signup(@RequestBody @Valid SignupRequest signupRequest) {
 
         memberService.createSignup(signupRequest);
-        return ApiResponse.createdSuccess("회원 가입이 완료되었습니다.");
+        return SuccessResponse.createdSuccess("회원 가입이 완료되었습니다.");
     }
 
     @DeleteMapping
@@ -81,7 +81,7 @@ public class MemberController {
         Long memberId = PrincipalUtils.extractMemberId(principal);
 
         memberService.deleteMember(memberId);
-        return ApiResponse.deletedSuccess("회원 탈퇴가 완료되었습니다.");
+        return SuccessResponse.deletedSuccess("회원 탈퇴가 완료되었습니다.");
     }
 
     @GetMapping("/email")
@@ -89,13 +89,13 @@ public class MemberController {
     public ResponseEntity<String> findEmail(@RequestBody @Valid FindEmailRequest findEmailRequest) {
 
         String email = memberService.findEmail(findEmailRequest);
-        return ApiResponse.getObjectSuccess(email);
+        return SuccessResponse.getObjectSuccess(email);
     }
 
     @PutMapping("/password")
     @Operation(summary = "비밀번호 변경")
     public ResponseEntity<?> resetPassword(@RequestBody @Valid ResetPasswordRequest resetPasswordRequest) {
         memberService.resetPassword(resetPasswordRequest);
-        return ApiResponse.updatedSuccess("비밀번호가 변경되었습니다.");
+        return SuccessResponse.updatedSuccess("비밀번호가 변경되었습니다.");
     }
 }

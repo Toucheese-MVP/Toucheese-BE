@@ -21,7 +21,7 @@ import com.toucheese.cart.dto.CartUpdateRequest;
 import com.toucheese.cart.dto.CheckoutCartItemsResponse;
 import com.toucheese.cart.dto.CombinedResponse;
 import com.toucheese.cart.service.CartService;
-import com.toucheese.global.data.ApiResponse;
+import com.toucheese.global.data.SuccessResponse;
 import com.toucheese.global.util.PrincipalUtils;
 import com.toucheese.member.dto.MemberContactInfoResponse;
 import com.toucheese.member.service.MemberService;
@@ -64,7 +64,7 @@ public class CartController {
 		Long memberId = PrincipalUtils.extractMemberId(principal);
 		cartService.createCart(cartRequest, memberId);
 
-		return ApiResponse.createdSuccess("장바구니가 생성되었습니다.");
+		return SuccessResponse.createdSuccess("장바구니가 생성되었습니다.");
 	}
 
 	@Operation(summary = "장바구니 목록 조회(회원)",
@@ -89,7 +89,7 @@ public class CartController {
 	@GetMapping("/carts/list")
 	public ResponseEntity<List<CartResponse>> getCartList(Principal principal) {
 		Long memberId = PrincipalUtils.extractMemberId(principal);
-		return ApiResponse.getObjectSuccess(cartService.findCartList(memberId));
+		return SuccessResponse.getObjectSuccess(cartService.findCartList(memberId));
 	}
 
 	@Operation(summary = "해당 장바구니 삭제", description = "해당하는 장바구니를 삭제합니다.",
@@ -106,7 +106,7 @@ public class CartController {
 		Long memberId = PrincipalUtils.extractMemberId(principal);
 		cartService.deleteCart(cartId, memberId);
 
-		return ApiResponse.deletedSuccess("장바구니 항목이 삭제되었습니다.");
+		return SuccessResponse.deletedSuccess("장바구니 항목이 삭제되었습니다.");
 	}
 
 	@Operation(summary = "장바구니 옵션 및 인원 변경", description = """
@@ -128,7 +128,7 @@ public class CartController {
 		Long memberId = PrincipalUtils.extractMemberId(principal);
 		cartService.updateCart(cartId, request, memberId);
 
-		return ApiResponse.updatedSuccess("장바구니가 성공적으로 업데이트되었습니다.");
+		return SuccessResponse.updatedSuccess("장바구니가 성공적으로 업데이트되었습니다.");
 	}
 
 	@Operation(summary = "장바구니 결제 조회", description = """
@@ -170,6 +170,6 @@ public class CartController {
 		MemberContactInfoResponse memberContactInfo = memberService.findMemberContactInfo(memberId);
 
 		CombinedResponse combinedResponse = new CombinedResponse(checkoutCartItems, memberContactInfo);
-		return ApiResponse.getObjectSuccess(combinedResponse);
+		return SuccessResponse.getObjectSuccess(combinedResponse);
 	}
 }

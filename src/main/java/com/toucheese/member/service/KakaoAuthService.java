@@ -2,6 +2,7 @@ package com.toucheese.member.service;
 
 import java.util.Map;
 
+import com.toucheese.global.exception.ToucheeseBadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.toucheese.global.exception.ToucheeseBadRequestException;
 import com.toucheese.member.dto.KakaoMember;
 import com.toucheese.member.dto.SocalLoginCombinedResponse;
 import com.toucheese.member.dto.SocialLoginRequest;

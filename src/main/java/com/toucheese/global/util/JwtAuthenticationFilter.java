@@ -1,8 +1,10 @@
 package com.toucheese.global.util;
 
 import com.toucheese.global.data.JwtValidateStatus;
+import com.toucheese.global.exception.ErrorCode;
+import com.toucheese.global.exception.ToucheeseBadRequestException;
+import com.toucheese.global.exception.ToucheeseException;
 import com.toucheese.global.exception.ToucheeseInternalServerErrorException;
-import com.toucheese.global.exception.ToucheeseUnAuthorizedException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,16 +35,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             switch (validateStatus) {
                 case DENIED:
                     SecurityContextHolder.clearContext();
-                    throw new ToucheeseUnAuthorizedException("올바르지 않은 토큰입니다.");
+                    // throw new ToucheeseUnAuthorizedException("올바르지 않은 토큰입니다.");
+                    throw new ToucheeseBadRequestException(ErrorCode.INVALID_ACCESS_TOKEN);
                 case EXPIRED:
                     SecurityContextHolder.clearContext();
-                    throw new ToucheeseUnAuthorizedException("토큰이 만료되었습니다.");
+                    // throw new ToucheeseUnAuthorizedException("토큰이 만료되었습니다.");
+                    throw new ToucheeseBadRequestException(ErrorCode.EXPIRED_ACCESS_TOKEN);
                 case ACCEPTED:
                     Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                     break;
                 default:
-                    throw new ToucheeseInternalServerErrorException("올바르지 않은 토큰 상태입니다.");
+                    // throw new ToucheeseInternalServerErrorException("올바르지 않은 토큰 상태입니다.");
+                    throw new ToucheeseInternalServerErrorException(ErrorCode.INVALID_TOKEN_STATUS);
             }
         }
 
