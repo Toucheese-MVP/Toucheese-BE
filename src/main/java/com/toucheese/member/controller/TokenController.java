@@ -15,7 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.ErrorResponse;
+import com.toucheese.global.data.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 @Controller

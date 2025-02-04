@@ -10,7 +10,10 @@ import java.util.Map;
 import javax.crypto.SecretKey;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.toucheese.global.exception.ErrorCode;
+import com.toucheese.global.exception.ToucheeseJwtException;
 import com.toucheese.member.entity.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtTokenProvider {
 
     private final SecretKey secretKey;
+    private final ObjectMapper objectMapper;
 
     @Value("${jwt.access-token-expiration}")
     private Long accessTokenExpiration;
@@ -40,8 +44,9 @@ public class JwtTokenProvider {
     private Long refreshTokenExpiration;
 
 
-    public JwtTokenProvider(AppConfig appConfig) {
+    public JwtTokenProvider(AppConfig appConfig, ObjectMapper objectMapper) {
         this.secretKey = Keys.hmacShaKeyFor(appConfig.getSecretKey());
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -123,9 +128,18 @@ public class JwtTokenProvider {
     }
 
 
-    public Map<String, String> parseHeaders(String token) throws JsonProcessingException {
-        String header = token.split("\\.")[0];
-        return new ObjectMapper().readValue(decodeHeader(header), Map.class);
+    public Map<String, String> parseHeaders(String token) {
+        String[] parts = token.split("\\.");
+        if (parts.length != 3) {
+            throw new ToucheeseJwtException(ErrorCode.INVALID_ID_TOKEN);
+        }
+        String header = decodeHeader(parts[0]);
+        try {
+            return objectMapper.readValue(header, new TypeReference<Map<String, String>>() {
+            });
+        } catch (JsonProcessingException e) {
+            throw new ToucheeseJwtException(ErrorCode.INVALID_HEADER_PARSING);
+        }
     }
 
     public String decodeHeader(String token) {
