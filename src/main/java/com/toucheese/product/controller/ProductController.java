@@ -1,6 +1,6 @@
 package com.toucheese.product.controller;
 
-import com.toucheese.global.data.ApiResponse;
+import com.toucheese.global.data.SuccessResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +30,6 @@ public class ProductController {
 	@GetMapping("/{productId}")
 	@Operation(summary = "상품 상세 조회", description = "상품 클릭 시 상품 상세 조회")
 	public ResponseEntity<ProductDetailResponse> findProductDetailById(@PathVariable("productId") Long productId) {
-		return ApiResponse.getObjectSuccess(productService.findProductDetailById(productId));
+		return SuccessResponse.getObjectSuccess(productService.findProductDetailById(productId));
 	}
 }

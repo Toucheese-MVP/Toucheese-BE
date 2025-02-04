@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toucheese.admin.service.AdminAnswerService;
-import com.toucheese.global.data.ApiResponse;
+import com.toucheese.global.data.SuccessResponse;
 import com.toucheese.question.dto.AnswerRequest;
 import com.toucheese.question.dto.QuestionDetailResponse;
 import com.toucheese.question.dto.QuestionResponse;
@@ -35,7 +35,7 @@ public class AdminAnswerController {
     @GetMapping
     public ResponseEntity<Page<QuestionResponse>> getAllQuestions(@RequestParam int page) {
         Page<QuestionResponse> questions = adminAnswerService.getAllQuestions(page);
-        return ApiResponse.getObjectSuccess(questions);
+        return SuccessResponse.getObjectSuccess(questions);
     }
 
     // 특정 문의글 조회
@@ -43,7 +43,7 @@ public class AdminAnswerController {
     @GetMapping("/{questionId}")
     public ResponseEntity<QuestionDetailResponse> getQuestionById(@PathVariable Long questionId) {
         QuestionDetailResponse question = adminAnswerService.findQuestionDetail(questionId);
-        return ApiResponse.getObjectSuccess(question);
+        return SuccessResponse.getObjectSuccess(question);
     }
 
     // 답변 작성
@@ -51,7 +51,7 @@ public class AdminAnswerController {
     @PostMapping("/{questionId}/answers")
     public ResponseEntity<?> addAnswer(@PathVariable Long questionId, @RequestBody AnswerRequest request) {
         adminAnswerService.addAnswer(questionId, request.title(), request.content());
-        return ApiResponse.createdSuccess("답변이 성공적으로 생성되었습니다.");
+        return SuccessResponse.createdSuccess("답변이 성공적으로 생성되었습니다.");
     }
 
     // 답변 수정
@@ -59,7 +59,7 @@ public class AdminAnswerController {
     @PutMapping("/answers/{answerId}")
     public ResponseEntity<?> updateAnswer(@PathVariable Long answerId, @RequestBody AnswerRequest request) {
         adminAnswerService.updateAnswer(answerId, request);
-        return ApiResponse.updatedSuccess("답변이 성공적으로 수정되었습니다.");
+        return SuccessResponse.updatedSuccess("답변이 성공적으로 수정되었습니다.");
     }
 
     // 답변 삭제
@@ -67,6 +67,6 @@ public class AdminAnswerController {
     @DeleteMapping("/answers/{answerId}")
     public ResponseEntity<?> deleteAnswer(@PathVariable Long answerId) {
         adminAnswerService.deleteAnswer(answerId);
-        return ApiResponse.deletedSuccess("답변이 성공적으로 삭제되었습니다.");
+        return SuccessResponse.deletedSuccess("답변이 성공적으로 삭제되었습니다.");
     }
 }

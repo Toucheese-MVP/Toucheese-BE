@@ -3,7 +3,7 @@ package com.toucheese.concept.controller;
 import com.toucheese.concept.dto.ConceptResponse;
 import com.toucheese.concept.service.ConceptService;
 
-import com.toucheese.global.data.ApiResponse;
+import com.toucheese.global.data.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +30,6 @@ public class ConceptController {
             + "5. 선명하고 인형같은 느낌, "
             + "6. 필터 / 수채화 그림체 느낌")
     public ResponseEntity<List<ConceptResponse>> getAllConcepts() {
-        return ApiResponse.getObjectSuccess(conceptService.getAllConcepts());
+        return SuccessResponse.getObjectSuccess(conceptService.getAllConcepts());
     }
 }

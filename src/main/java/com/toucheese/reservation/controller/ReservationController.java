@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.toucheese.cart.dto.CartIdsRequest;
 import com.toucheese.cart.service.CartService;
-import com.toucheese.global.data.ApiResponse;
+import com.toucheese.global.data.SuccessResponse;
 import com.toucheese.global.util.PrincipalUtils;
 import com.toucheese.reservation.dto.ReservationResponse;
 import com.toucheese.reservation.dto.ReservationUpdateRequest;
@@ -54,7 +54,7 @@ public class ReservationController {
 		Long memberId = PrincipalUtils.extractMemberId(principal);
 
 		cartService.createReservationsFromCart(memberId, cartIdsRequest);
-		return ApiResponse.createdSuccess("결제가 완료되었습니다.");
+		return SuccessResponse.createdSuccess("결제가 완료되었습니다.");
 	}
 
 	@Operation(summary = "사용자 예약 조회",
@@ -66,7 +66,7 @@ public class ReservationController {
 		Long memberId = PrincipalUtils.extractMemberId(principal);
 
 		Page<ReservationResponse> reservations = reservationReadService.findPagedReservationsByMemberId(memberId, page);
-		return ApiResponse.getObjectSuccess(reservations);
+		return SuccessResponse.getObjectSuccess(reservations);
 	}
 
 	@Operation(summary = "사용자 예약 수정")
@@ -79,7 +79,7 @@ public class ReservationController {
 		Long memberId = PrincipalUtils.extractMemberId(principal);
 
 		reservationService.updateReservation(memberId, reservationId, request);
-		return ApiResponse.updatedSuccess("예약 상태를 성공적으로 업데이트했습니다.");
+		return SuccessResponse.updatedSuccess("예약 상태를 성공적으로 업데이트했습니다.");
 	}
 
 	@Operation(
@@ -104,6 +104,6 @@ public class ReservationController {
 		Long memberId = PrincipalUtils.extractMemberId(principal);
 
 		reservationService.createInstantReservation(memberId, reservationRequest);
-		return ApiResponse.createdSuccess("예약접수가 완료되었습니다.");
+		return SuccessResponse.createdSuccess("예약접수가 완료되었습니다.");
 	}
 }

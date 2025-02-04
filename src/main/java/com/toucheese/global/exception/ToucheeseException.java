@@ -12,4 +12,3 @@ public abstract class ToucheeseException extends RuntimeException{
 
     public abstract HttpStatus getHttpStatus();
 }
-

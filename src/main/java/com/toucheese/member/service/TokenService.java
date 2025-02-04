@@ -2,11 +2,11 @@ package com.toucheese.member.service;
 
 import java.util.UUID;
 
+import com.toucheese.global.exception.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.toucheese.global.data.JwtValidateStatus;
-import com.toucheese.global.exception.ToucheeseUnAuthorizedException;
 import com.toucheese.global.util.JwtTokenProvider;
 import com.toucheese.member.dto.MemberTokenResponse;
 import com.toucheese.member.dto.ReissueRequest;
@@ -65,7 +65,8 @@ public class TokenService {
     @Transactional(readOnly = true)
 	public Token findTokenByDeviceId(String deviceId) {
 		return tokenRepository.findByDeviceId(deviceId)
-			.orElseThrow(ToucheeseUnAuthorizedException::new);
+            // .orElseThrow(ToucheeseUnAuthorizedException::new);
+            .orElseThrow(() -> new ToucheeseJwtException(ErrorCode.TOKEN_NOT_FOUND));
 	}
 
     /**
@@ -131,20 +132,30 @@ public class TokenService {
                 .build();
     }
 
+
     /**
      * RefreshToken 을 검증하기 위한 토큰
      * @param refreshToken 갱신 토큰
-     * @throws ToucheeseUnAuthorizedException 갱신 토큰 또한 만료되었을 경우 재로그인 요청
+     * @throws ToucheeseException 갱신 토큰 또한 만료되었을 경우 재로그인 요청
      */
     public void checkRefreshToken(String refreshToken, String requestRefreshToken) {
         JwtValidateStatus jwtValidateStatus = jwtTokenProvider.validateToken(refreshToken);
 
-        if (jwtValidateStatus == JwtValidateStatus.EXPIRED ||
-                jwtValidateStatus == JwtValidateStatus.DENIED ||
-                !refreshToken.equals(requestRefreshToken)
-        ) {
-            throw new ToucheeseUnAuthorizedException("재로그인이 필요합니다.");
+        if (jwtValidateStatus == JwtValidateStatus.EXPIRED) {
+            // throw new ToucheeseBadRequestException(ErrorCode.EXPIRED_REFRESH_TOKEN);
+            throw new ToucheeseJwtException(ErrorCode.EXPIRED_REFRESH_TOKEN);
+        }
+
+        if (jwtValidateStatus == JwtValidateStatus.DENIED) {
+            // throw new ToucheeseBadRequestException(ErrorCode.INVALID_REFRESH_TOKEN);
+            throw new ToucheeseJwtException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        if (!refreshToken.equals(requestRefreshToken)) {
+            // throw new ToucheeseBadRequestException(ErrorCode.REFRESH_TOKEN_MISMATCH);
+            throw new ToucheeseJwtException(ErrorCode.REFRESH_TOKEN_MISMATCH);
         }
     }
+
 
 }

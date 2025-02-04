@@ -16,8 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.toucheese.admin.dto.AdminReservationListResponse;
 import com.toucheese.admin.dto.UpdateReservationStatusRequest;
 import com.toucheese.admin.service.AdminReservationService;
-import com.toucheese.global.data.ApiResponse;
-import com.toucheese.global.util.PageUtils;
+import com.toucheese.global.data.SuccessResponse;
 import com.toucheese.reservation.entity.ReservationStatus;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +39,7 @@ public class AdminReservationController {
 		@RequestParam(required = false) LocalDate createDate,
 		@RequestParam int page
 	) {
-		return ApiResponse.getObjectSuccess(adminReservationService.findReservations(status, createDate, page));
+		return SuccessResponse.getObjectSuccess(adminReservationService.findReservations(status, createDate, page));
 	}
 
 	@Operation(summary = "관리자 예약 상태 수정")
@@ -50,6 +49,6 @@ public class AdminReservationController {
 		@RequestBody UpdateReservationStatusRequest request
 	) {
 		adminReservationService.updateReservationStatus(reservationId, request.status());
-		return ApiResponse.updatedSuccess("예약 상태를 성공적으로 업데이트했습니다.");
+		return SuccessResponse.updatedSuccess("예약 상태를 성공적으로 업데이트했습니다.");
 	}
 }

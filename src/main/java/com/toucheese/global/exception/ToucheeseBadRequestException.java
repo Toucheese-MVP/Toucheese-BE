@@ -14,6 +14,10 @@ public class ToucheeseBadRequestException extends ToucheeseException {
         super(message);
     }
 
+    public ToucheeseBadRequestException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+    }
+
     @Override
     public HttpStatus getHttpStatus() {
         return HttpStatus.BAD_REQUEST;

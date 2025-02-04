@@ -2,7 +2,7 @@ package com.toucheese.studio.controller;
 
 import java.util.List;
 
-import com.toucheese.global.data.ApiResponse;
+import com.toucheese.global.data.SuccessResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +33,7 @@ public class StudioController {
 		description = "사용자가 입력한 키워드로 스튜디오를 검색합니다.",
 		parameters = @Parameter(name = "keyword", description = "검색할 키워드", required = true))
 	public ResponseEntity<List<StudioSearchResponse>> searchStudios(@RequestParam String keyword) {
-		return ApiResponse.getObjectSuccess(studioService.searchStudios(keyword));
+		return SuccessResponse.getObjectSuccess(studioService.searchStudios(keyword));
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class StudioController {
 	@Operation(summary = "스튜디오 상세 조회",
 		description = "사용자가 클릭한 스튜디오 상세조회")
 	public ResponseEntity<StudioDetailResponse> findStudioDetailById(@PathVariable Long studioId) {
-		return ApiResponse.getObjectSuccess(studioService.findStudioDetailById(studioId));
+		return SuccessResponse.getObjectSuccess(studioService.findStudioDetailById(studioId));
 	}
 
 	@GetMapping("/{studioId}/calendars")
@@ -55,6 +55,6 @@ public class StudioController {
 		@PathVariable Long studioId,
 		@RequestParam(required = false) String yearMonth
 	) {
-		return ApiResponse.getObjectSuccess(studioService.getMonthlyCalendar(studioId, yearMonth));
+		return SuccessResponse.getObjectSuccess(studioService.getMonthlyCalendar(studioId, yearMonth));
 	}
 }
