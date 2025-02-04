@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import com.toucheese.global.data.ApiResponse;
+import com.toucheese.global.data.SuccessResponse;
 import com.toucheese.question.dto.QuestionDetailResponse;
 import com.toucheese.question.dto.QuestionRequest;
 import com.toucheese.question.dto.QuestionResponse;
@@ -40,7 +40,7 @@ public class QuestionController {
             Principal principal
     ) {
         questionService.createQuestion(questionRequest, principal);
-        return ApiResponse.createdSuccess("문의하기 글이 성공적으로 생성되었습니다.");
+        return SuccessResponse.createdSuccess("문의하기 글이 성공적으로 생성되었습니다.");
     }
 
     @GetMapping("/{questionId}")
@@ -61,7 +61,7 @@ public class QuestionController {
     )
     public ResponseEntity<QuestionDetailResponse> getQuestionById(@PathVariable Long questionId, Principal principal){
         QuestionDetailResponse response = questionService.findQuestionDetailById(questionId);
-        return ApiResponse.getObjectSuccess(response);
+        return SuccessResponse.getObjectSuccess(response);
     }
 
     @GetMapping
@@ -78,7 +78,7 @@ public class QuestionController {
     )
     public ResponseEntity<Page<QuestionResponse>> getQuestions(Principal principal, @RequestParam int page) {
         Page<QuestionResponse> questions = questionService.findQuestions(principal, page);
-        return ApiResponse.getObjectSuccess(questions);
+        return SuccessResponse.getObjectSuccess(questions);
     }
 
     @PutMapping("/{questionId}")
@@ -94,7 +94,7 @@ public class QuestionController {
     )
     public ResponseEntity<?> updateQuestion(@PathVariable Long questionId, @RequestBody QuestionRequest questionRequest, Principal principal) {
         questionService.updateQuestion(questionId, questionRequest, principal);
-        return ApiResponse.updatedSuccess("문의하기 글이 성공적으로 수정되었습니다.");
+        return SuccessResponse.updatedSuccess("문의하기 글이 성공적으로 수정되었습니다.");
     }
 
     // 게시글 삭제
@@ -108,6 +108,6 @@ public class QuestionController {
     )
     public ResponseEntity<?> deleteQuestion(@PathVariable Long questionId, Principal principal) {
         questionService.deleteQuestion(questionId, principal);
-        return ApiResponse.deletedSuccess("문의하기 글이 성공적으로 삭제되었습니다.");
+        return SuccessResponse.deletedSuccess("문의하기 글이 성공적으로 삭제되었습니다.");
     }
 }

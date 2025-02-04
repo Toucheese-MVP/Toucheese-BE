@@ -2,7 +2,7 @@ package com.toucheese.conceptstudio.controller;
 
 import com.toucheese.conceptstudio.dto.StudioResponse;
 import com.toucheese.conceptstudio.service.ConceptStudioService;
-import com.toucheese.global.data.ApiResponse;
+import com.toucheese.global.data.SuccessResponse;
 import com.toucheese.studio.entity.Location;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,8 +26,10 @@ public class ConceptStudioController {
     public ResponseEntity<Page<StudioResponse>> getStudiosByConceptId(
             @PathVariable Long conceptId,
             @RequestParam int page
+            // @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable
     ) {
-        return ApiResponse.getObjectSuccess(conceptStudioService.getStudiosByConceptId(conceptId, page));
+        return SuccessResponse.getObjectSuccess(conceptStudioService.getStudiosByConceptId(conceptId, page));
+        // return ApiResponse.getObjectSuccess(conceptStudioService.getStudiosByConceptId(conceptId, pageable));
     }
 
     /**
@@ -48,7 +50,7 @@ public class ConceptStudioController {
             @RequestParam(required = false) Float rating,
             @RequestParam(required = false) List<Location> locations
     ) {
-        return ApiResponse.getObjectSuccess(conceptStudioService.getFilteredStudiosOrderByName(
+        return SuccessResponse.getObjectSuccess(conceptStudioService.getFilteredStudiosOrderByName(
                 page, conceptId, price, rating, locations
         ));
     }}

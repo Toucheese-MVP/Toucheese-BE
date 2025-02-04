@@ -2,11 +2,9 @@ package com.toucheese.solapi.util;
 
 import com.toucheese.global.exception.ToucheeseBadRequestException;
 import com.toucheese.global.exception.ToucheeseInternalServerErrorException;
-import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.exception.NurigoMessageNotReceivedException;
 import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.service.DefaultMessageService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,12 +1,11 @@
 package com.toucheese.global.data;
 
-import com.toucheese.member.dto.LoginResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public class ApiResponse<T> extends ResponseEntity<T> {
+public class SuccessResponse<T> extends ResponseEntity<T> {
 
-    public ApiResponse(HttpStatus status) {
+    public SuccessResponse(HttpStatus status) {
         super(status);
     }
 
