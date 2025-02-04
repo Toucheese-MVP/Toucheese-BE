@@ -14,6 +14,10 @@ public class ToucheeseInternalServerErrorException extends ToucheeseException {
         super(message);
     }
 
+    public ToucheeseInternalServerErrorException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+    }
+
     @Override
     public HttpStatus getHttpStatus() {
         return HttpStatus.INTERNAL_SERVER_ERROR;

@@ -2,12 +2,12 @@ package com.toucheese.member.service;
 
 import java.security.Principal;
 
+import com.toucheese.global.exception.ToucheeseBadRequestException;
 import com.toucheese.member.dto.AppleMember;
 import com.toucheese.member.dto.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.toucheese.global.exception.ToucheeseBadRequestException;
 import com.toucheese.global.util.PrincipalUtils;
 import com.toucheese.member.entity.Member;
 import com.toucheese.member.entity.Role;

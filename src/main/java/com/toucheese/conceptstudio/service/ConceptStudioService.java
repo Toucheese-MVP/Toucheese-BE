@@ -24,6 +24,14 @@ public class ConceptStudioService {
 	private final StudioRepositoryImpl studioRepositoryImpl;
 	private final ImageConfig imageConfig;
 
+//	@Transactional(readOnly = true)
+//	public Page<StudioResponse> getStudiosByConceptId(Long conceptId, int page) {
+//		Pageable pageable = PageUtils.createPageable(page);
+//		return conceptStudioRepository.findByConceptId(conceptId, pageable).map( conceptStudio ->
+//				StudioResponse.of(conceptStudio.getStudio(), imageConfig.getResizedImageBaseUrl())
+//		);
+//	}
+
 	@Transactional(readOnly = true)
 	public Page<StudioResponse> getStudiosByConceptId(Long conceptId, int page) {
 		Pageable pageable = PageUtils.createPageable(page);

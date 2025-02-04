@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.toucheese.global.exception.ToucheeseBadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.toucheese.global.config.ImageConfig;
-import com.toucheese.global.exception.ToucheeseBadRequestException;
 import com.toucheese.studio.dto.CalendarDayResponse;
 import com.toucheese.studio.dto.StudioDetailResponse;
 import com.toucheese.studio.dto.StudioSearchResponse;

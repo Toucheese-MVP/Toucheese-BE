@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.toucheese.global.data.ApiResponse;
+import com.toucheese.global.data.SuccessResponse;
 import com.toucheese.member.service.KakaoAuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,7 +46,7 @@ public class AuthController {
 	public ResponseEntity<SocialLoginResponse> kakaoLogin(@Valid @RequestBody SocialLoginRequest socialLoginRequest) {
 		SocalLoginCombinedResponse socalLoginCombinedResponse = kakaoAuthService.handleKakaoLogin(socialLoginRequest);
 
-		return ApiResponse.accessTokenResponse(
+		return SuccessResponse.accessTokenResponse(
 			socalLoginCombinedResponse.socialLoginResponse(),
 			socalLoginCombinedResponse.accessToken());
 	}
@@ -59,7 +59,7 @@ public class AuthController {
 
 		SocalLoginCombinedResponse socalLoginCombinedResponse = kakaoAuthService.handleKakaoLogin(socialLoginRequest);
 
-		return ApiResponse.accessTokenResponse(
+		return SuccessResponse.accessTokenResponse(
 			socalLoginCombinedResponse.socialLoginResponse(),
 			socalLoginCombinedResponse.accessToken());
 	}
@@ -78,7 +78,7 @@ public class AuthController {
 	{
 		SocalLoginCombinedResponse socalLoginCombinedResponse = appleAuthService.handleAppleLogin(appleAuthRequest);
 
-		return ApiResponse.accessTokenResponse(
+		return SuccessResponse.accessTokenResponse(
 				socalLoginCombinedResponse.socialLoginResponse(),
 				socalLoginCombinedResponse.accessToken());
 	}
