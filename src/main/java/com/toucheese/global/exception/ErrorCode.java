@@ -16,7 +16,10 @@ public enum ErrorCode {
     TOKEN_NOT_FOUND(4004, HttpStatus.BAD_REQUEST, "deviceId에 해당하는 토큰을 찾을 수 없습니다."),
     EXPIRED_ACCESS_TOKEN(4005, HttpStatus.UNAUTHORIZED, "Access 토큰이 만료되었습니다."),
     INVALID_ACCESS_TOKEN(4006, HttpStatus.FORBIDDEN, "Access 토큰이 유효하지 않습니다."),
-    INVALID_TOKEN_STATUS(4007, HttpStatus.INTERNAL_SERVER_ERROR, "올바르지 않은 토큰 상태입니다.");
+    INVALID_TOKEN_STATUS(4007, HttpStatus.INTERNAL_SERVER_ERROR, "올바르지 않은 토큰 상태입니다."),
+    INVALID_ID_TOKEN(4008, HttpStatus.BAD_REQUEST, "[Apple Login] ID 토큰이 유효하지 않습니다."),
+    INVALID_HEADER_PARSING(4009, HttpStatus.BAD_REQUEST, "[Apple Login] IdToken 헤더 파싱에 실패했습니다.");
+
 
     // 회원 관련 에러 (4101 ~ 4199)
     // 스튜디오 관련 에러 (4201 ~ 4299)
