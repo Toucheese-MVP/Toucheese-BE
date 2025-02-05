@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.toucheese.member.service.MemberService;
 import com.toucheese.reservation.dto.ReservationRequest;
+import com.toucheese.reservation.dto.ReservationSuccessResponse;
 import com.toucheese.studio.repository.StudioRepository;
 import com.toucheese.studio.service.StudioService;
 import org.springframework.stereotype.Service;
@@ -73,7 +74,7 @@ public class ReservationService {
 	}
 
 	@Transactional
-	public Boolean createInstantReservation(Long memberId, ReservationRequest reservationRequest) {
+	public ReservationSuccessResponse createInstantReservation(Long memberId, ReservationRequest reservationRequest) {
 		List<ProductAddOption> productAddOptions = productService.findProductAddOptionsByProductIdAndAddOptionIds(
 				reservationRequest.productId(), reservationRequest.addOptions()
 		);
@@ -100,6 +101,18 @@ public class ReservationService {
 				.build();
 
 		reservationRepository.save(reservation);
-		return true;
+		return ReservationSuccessResponse.builder()
+				.productId(reservation.getProduct().getId())
+				.studioId(reservation.getStudio().getId())
+				.memberId(reservation.getMember().getId())
+				.totalPrice(reservation.getTotalPrice())
+				.createDate(reservation.getCreateDate())
+				.createTime(reservation.getCreateTime())
+				.personnel(reservation.getPersonnel())
+				.addOptions(reservationProductAddOptions.stream()
+						.map(option -> option.getProductAddOption().getId())
+						.collect(Collectors.toList()))
+				.status(true)
+				.build();
 	}
 }
