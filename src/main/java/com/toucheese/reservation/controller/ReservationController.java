@@ -3,6 +3,7 @@ package com.toucheese.reservation.controller;
 import java.security.Principal;
 
 import com.toucheese.reservation.dto.ReservationRequest;
+import com.toucheese.reservation.dto.ReservationSuccessResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -100,11 +101,11 @@ public class ReservationController {
     """
 	)
 	@PostMapping("/instant")
-	public boolean createInstantReservation(Principal principal, @RequestBody ReservationRequest reservationRequest) {
+	public ResponseEntity<ReservationSuccessResponse> createInstantReservation(Principal principal, @RequestBody ReservationRequest reservationRequest) {
 		Long memberId = PrincipalUtils.extractMemberId(principal);
 
-		reservationService.createInstantReservation(memberId, reservationRequest);
-		return true;
+		ReservationSuccessResponse response = reservationService.createInstantReservation(memberId, reservationRequest);
+		return ResponseEntity.ok(response);
 	}
 
 }
