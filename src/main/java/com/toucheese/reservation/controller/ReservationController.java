@@ -100,10 +100,11 @@ public class ReservationController {
     """
 	)
 	@PostMapping("/instant")
-	public ResponseEntity<?> createInstantReservation(Principal principal, @RequestBody ReservationRequest reservationRequest) {
+	public boolean createInstantReservation(Principal principal, @RequestBody ReservationRequest reservationRequest) {
 		Long memberId = PrincipalUtils.extractMemberId(principal);
 
 		reservationService.createInstantReservation(memberId, reservationRequest);
-		return SuccessResponse.createdSuccess("예약접수가 완료되었습니다.");
+		return true;
 	}
+
 }

@@ -72,7 +72,8 @@ public class ReservationService {
 		reservation.updateReservationStatusAndTime(request);
 	}
 
-	public void createInstantReservation(Long memberId, ReservationRequest reservationRequest) {
+	@Transactional
+	public Boolean createInstantReservation(Long memberId, ReservationRequest reservationRequest) {
 		List<ProductAddOption> productAddOptions = productService.findProductAddOptionsByProductIdAndAddOptionIds(
 				reservationRequest.productId(), reservationRequest.addOptions()
 		);
@@ -99,6 +100,6 @@ public class ReservationService {
 				.build();
 
 		reservationRepository.save(reservation);
-
+		return true;
 	}
 }
