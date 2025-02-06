@@ -102,16 +102,16 @@ public class ReservationService {
 
 		reservationRepository.save(reservation);
 		return ReservationSuccessResponse.builder()
-				.productId(reservation.getProduct().getId())
-				.studioId(reservation.getStudio().getId())
-				.memberId(reservation.getMember().getId())
-				.totalPrice(reservation.getTotalPrice())
-				.createDate(reservation.getCreateDate())
-				.createTime(reservation.getCreateTime())
-				.personnel(reservation.getPersonnel())
-				.addOptions(reservationProductAddOptions.stream()
-						.map(option -> option.getProductAddOption().getId())
-						.collect(Collectors.toList()))
+//				.productId(reservation.getProduct().getId())
+//				.studioId(reservation.getStudio().getId())
+//				.memberId(reservation.getMember().getId())
+//				.totalPrice(reservation.getTotalPrice())
+//				.createDate(reservation.getCreateDate())
+//				.createTime(reservation.getCreateTime())
+//				.personnel(reservation.getPersonnel())
+//				.addOptions(reservationProductAddOptions.stream()
+//						.map(option -> option.getProductAddOption().getId())
+//						.collect(Collectors.toList()))
 				.status(true)
 				.build();
 	}
