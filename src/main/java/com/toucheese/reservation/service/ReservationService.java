@@ -91,6 +91,7 @@ public class ReservationService {
 				.product(productService.findProductById(reservationRequest.productId()))
 				.studio(studioService.findStudioById(reservationRequest.studioId()))
 				.member(memberService.findMemberById(memberId))
+				.phone(reservationRequest.phone())
 				.totalPrice(reservationRequest.totalPrice())
 				.createDate(reservationRequest.createDate())
 				.createTime(reservationRequest.createTime())
