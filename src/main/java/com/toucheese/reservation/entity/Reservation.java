@@ -39,6 +39,8 @@ public class Reservation {
 
 	private Integer totalPrice;
 
+	private String phone;
+
 	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	private LocalDate createDate;
 
