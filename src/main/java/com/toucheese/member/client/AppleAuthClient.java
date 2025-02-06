@@ -4,7 +4,7 @@ import com.toucheese.member.dto.ApplePublicKeyResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
-@FeignClient(name = "appleAuthClient", url = "https://appleid.apple.com/auth/keys")
+@FeignClient(name = "appleAuthClient", url = "${apple.auth.public-key-url}")
 public interface AppleAuthClient {
     @GetMapping
     ApplePublicKeyResponse getAppleAuthPublicKey();

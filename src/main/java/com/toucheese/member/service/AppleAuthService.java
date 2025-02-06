@@ -14,6 +14,8 @@ import com.toucheese.member.entity.Member;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import reactor.core.publisher.Mono;
 
 import javax.naming.AuthenticationException;
@@ -35,6 +37,9 @@ public class AppleAuthService {
         return appleAuthClient.getAppleAuthPublicKey();
     }
 
+    /**
+     * apple 로그인 처리
+     */
     public SocalLoginCombinedResponse handleAppleLogin(AppleAuthRequest appleAuthRequest) throws
             AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException
     {
@@ -50,6 +55,10 @@ public class AppleAuthService {
 
     }
 
+
+    /**
+     * 애플의 identityToken 검증 및 사용자 정보 추출
+     */
     public Mono<AppleMember> getAppleMemberInfo(String identityToken) throws
             JsonProcessingException, AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException
     {

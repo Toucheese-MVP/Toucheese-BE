@@ -122,7 +122,6 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
     }
 
-
     public Map<String, String> parseHeaders(String token) throws JsonProcessingException {
         String header = token.split("\\.")[0];
         return new ObjectMapper().readValue(decodeHeader(header), Map.class);
@@ -139,5 +138,4 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
     }
-
 }

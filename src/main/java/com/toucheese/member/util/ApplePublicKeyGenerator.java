@@ -26,12 +26,18 @@ public class ApplePublicKeyGenerator {
     public PublicKey generatePublicKey(
             Map<String, String> tokenHeaders,
             ApplePublicKeyResponse applePublicKeys
-    ) throws AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException {
-        ApplePublicKey publicKey = applePublicKeys.getMatchedKey(tokenHeaders.get("kid"), tokenHeaders.get("alg"));
+    ) throws AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException
+    {
+        ApplePublicKey publicKey = applePublicKeys.getMatchedKey(
+                tokenHeaders.get("kid"),
+                tokenHeaders.get("alg")
+        );
         return getPublicKey(publicKey);
     }
 
-    private PublicKey getPublicKey(ApplePublicKey publicKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    private PublicKey getPublicKey(ApplePublicKey publicKey)
+            throws NoSuchAlgorithmException, InvalidKeySpecException
+    {
         byte[] nBytes = Base64.getUrlDecoder().decode(publicKey.n());
         byte[] eBytes = Base64.getUrlDecoder().decode(publicKey.e());
 
