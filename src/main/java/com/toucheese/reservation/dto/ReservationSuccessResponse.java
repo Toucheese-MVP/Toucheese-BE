@@ -13,21 +13,22 @@ import java.util.List;
 @AllArgsConstructor
 public class ReservationSuccessResponse {
     // 상품
-    private Long productId;
+//    private Long productId;
     // 스튜디오
-    private Long studioId;
+//    private Long studioId;
     // 회원
-    private Long memberId;
+//    private Long memberId;
     // 총 가격
-    private Integer totalPrice;
+//    private Integer totalPrice;
     // 예약 날짜 && 시간
-    private LocalDate createDate;
+//    private LocalDate createDate;
 
-    private LocalTime createTime;
+    //    private LocalTime createTime;
     // 인원
-    private Integer personnel;
+//    private Integer personnel;
     // 옵션
-    private List<Long> addOptions;
+//    private List<Long> addOptions;
+
     // 성공 여부
     private boolean status;
 }
