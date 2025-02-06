@@ -21,6 +21,8 @@ public record ReservationRequest(
         Long studioId,
 		@Schema(description = "회원 ID", example = "1")
         Long memberId,
+        @Schema(description = "", example = "010-0000-0000")
+        String phone,
 		@Schema(description = "총 가격", example = "100000")
         Integer totalPrice,
 		@Schema(description = "예약 날짜", example = "2025-01-21")
