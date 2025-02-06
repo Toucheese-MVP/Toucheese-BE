@@ -91,6 +91,8 @@ public class ReservationController {
         {
             "productId": 1,
             "studioId": 1,
+            "memberId": 1,
+            "phone": "010-1234-1234",
             "totalPrice": 10000,
             "createDate": "2025-01-21",
             "createTime": "19:00",
