@@ -95,7 +95,7 @@ public class TokenService {
      * @param deviceId 기기 아이디
      * @return true / false
      */
-    private boolean validDeviceId(String deviceId) {
+    public boolean validDeviceId(String deviceId) {
         return deviceId == null || deviceId.isBlank();
     }
 
@@ -158,4 +158,17 @@ public class TokenService {
     }
 
 
+    /**
+     *
+     * @param memberId
+     * @param deviceId
+     */
+    public void logout(Long memberId, String deviceId) {
+        Token token = tokenRepository.findByMemberIdAndDeviceId(memberId, deviceId)
+                .orElseThrow(() -> new ToucheeseJwtException(ErrorCode.TOKEN_NOT_FOUND));
+        if (!token.getMember().getId().equals(memberId)) {
+            throw new ToucheeseJwtException(ErrorCode.LOGOUT_UNAUTHORIZED_ACCESS);
+        }
+        tokenRepository.delete(token);
+    }
 }

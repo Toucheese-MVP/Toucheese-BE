@@ -1,6 +1,7 @@
 package com.toucheese.member.controller;
 
 import com.toucheese.global.data.SuccessResponse;
+import com.toucheese.global.util.PrincipalUtils;
 import com.toucheese.member.dto.MemberTokenResponse;
 import com.toucheese.member.dto.LoginResponse;
 import com.toucheese.member.dto.ReissueRequest;
@@ -17,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import com.toucheese.global.data.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
@@ -69,4 +72,14 @@ public class TokenController {
                 memberTokenResponse.tokenDTO().accessToken()
         );
     }
+
+    @DeleteMapping("/logout")
+    public ResponseEntity<?> logout(Principal principal, @RequestParam String deviceId) {
+        Long memberId = PrincipalUtils.extractMemberId(principal);
+
+        tokenService.logout(memberId, deviceId);
+        return SuccessResponse.deletedSuccess("로그아웃이 완료되었습니다.");
+    }
+
+
 }
