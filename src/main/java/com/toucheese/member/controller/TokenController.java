@@ -74,6 +74,7 @@ public class TokenController {
     }
 
     @DeleteMapping("/logout")
+    @Operation(summary = "회원 로그아웃", description = "요청 시 헤더에 access token 필요")
     public ResponseEntity<?> logout(Principal principal, @RequestParam String deviceId) {
         Long memberId = PrincipalUtils.extractMemberId(principal);
 
