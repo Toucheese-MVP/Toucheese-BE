@@ -2,7 +2,9 @@ package com.toucheese.reservation.service;
 
 import java.time.LocalDate;
 
+import com.toucheese.global.exception.ErrorCode;
 import com.toucheese.global.exception.ToucheeseBadRequestException;
+import com.toucheese.global.exception.ToucheeseJwtException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -47,4 +49,10 @@ public class ReservationReadService {
 		return reservationRepository.findByIdAndMemberId(reservationId, memberId)
 			.orElseThrow(() -> new ToucheeseBadRequestException("해당 예약이 존재하지 않거나 접근 권한이 없습니다."));
 	}
+
+//	@Transactional(readOnly = true)
+//	public Reservation findByMemberIdAndPhone(Long memberId, String phone) {
+//		return reservationRepository.findByMemberIdAndPhone(memberId, phone)
+//				.orElseThrow(() -> new ToucheeseJwtException(ErrorCode.DONT_HAVE_PHONE_NUMBER));
+//	}
 }
