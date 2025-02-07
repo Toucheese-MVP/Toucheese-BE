@@ -19,8 +19,9 @@ public enum ErrorCode {
     INVALID_TOKEN_STATUS(4007, HttpStatus.INTERNAL_SERVER_ERROR, "올바르지 않은 토큰 상태입니다."),
     INVALID_ID_TOKEN(4008, HttpStatus.BAD_REQUEST, "[Apple Login] ID 토큰이 유효하지 않습니다."),
     INVALID_HEADER_PARSING(4009, HttpStatus.BAD_REQUEST, "[Apple Login] IdToken 헤더 파싱에 실패했습니다."),
-    DONT_HAVE_RESERVATION(4010, HttpStatus.BAD_REQUEST, "예약된 정보가 없습니다."),
-    DONT_HAVE_PHONE_NUMBER(4011, HttpStatus.BAD_REQUEST, "전화번호가 없는 예약입니다.")
+    RESERVATION_NOT_FOUND(4010, HttpStatus.NOT_FOUND, "예약된 정보가 없습니다."),
+    PHONE_NOT_FOUND(4011, HttpStatus.NOT_FOUND, "전화번호가 없는 예약입니다."),
+    MEMBER_NOT_FOUND(4012, HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다.")
     ;
 
 
