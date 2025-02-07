@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import com.toucheese.global.exception.ErrorCode;
 import com.toucheese.global.exception.ToucheeseJwtException;
+import com.toucheese.member.entity.Member;
+import com.toucheese.member.repository.MemberRepository;
 import com.toucheese.member.service.MemberService;
 import com.toucheese.reservation.dto.ReservationRequest;
 import com.toucheese.reservation.dto.ReservationSuccessResponse;
@@ -37,6 +39,7 @@ public class ReservationService {
 	private final StudioService studioService;
 	private final ProductService productService;
 	private final MemberService memberService;
+	private final MemberRepository memberRepository;
 
 	@Transactional
 	public void createReservationsFromCarts(List<Cart> carts) {
@@ -79,6 +82,10 @@ public class ReservationService {
 	@Transactional
 	public ReservationSuccessResponse createInstantReservation(Long memberId, ReservationRequest reservationRequest) {
 
+		// 요청된 회원 ID 로그
+		System.out.println("회원 ID: " + memberId);
+
+		// 상품 추가 옵션 조회
 		List<ProductAddOption> productAddOptions = productService.findProductAddOptionsByProductIdAndAddOptionIds(
 				reservationRequest.productId(), reservationRequest.addOptions()
 		);
@@ -91,30 +98,27 @@ public class ReservationService {
 						))
 						.collect(Collectors.toList());
 
-		// 회원 ID에 대한 예약 목록 조회
-		List<Reservation> reservations = reservationRepository.findByMemberId(memberId);
+		// 회원 ID에 대한 회원 정보 조회
+		Optional<Member> memberOpt = memberRepository.findById(memberId);
 
-		// 예약이 없을 경우 예외 처리
-		if (reservations.isEmpty()) {
-			throw new ToucheeseJwtException(ErrorCode.DONT_HAVE_RESERVATION);
+		// 회원이 존재하지 않을 경우 예외 처리
+		if (memberOpt.isEmpty()) {
+			throw new ToucheeseJwtException(ErrorCode.MEMBER_NOT_FOUND);
+
 		}
 
-		// 전화번호가 있는 예약을 찾기
-		Optional<Reservation> reservationWithPhone = reservations.stream()
-				.filter(reservation -> reservation.getPhone() != null && !reservation.getPhone().isEmpty())
-				.findFirst();
-
-		// 전화번호가 있는 예약이 없을 경우 예외 처리
-		if (reservationWithPhone.isEmpty()) {
-			throw new ToucheeseJwtException(ErrorCode.DONT_HAVE_PHONE_NUMBER);
+		// 회원의 전화번호 유무 확인
+		Member member = memberOpt.get();
+		if (member.getPhone() == null || member.getPhone().isEmpty()) {
+			throw new ToucheeseJwtException(ErrorCode.PHONE_NOT_FOUND);
 		}
 
 		// 새로운 예약 생성
 		Reservation reservation = Reservation.builder()
 				.product(productService.findProductById(reservationRequest.productId()))
 				.studio(studioService.findStudioById(reservationRequest.studioId()))
-				.member(memberService.findMemberById(memberId))
-				.phone(reservationRequest.phone())
+				.member(member)
+				.phone(member.getPhone()) // 회원의 전화번호 사용
 				.totalPrice(reservationRequest.totalPrice())
 				.createDate(reservationRequest.createDate())
 				.createTime(reservationRequest.createTime())
@@ -131,6 +135,20 @@ public class ReservationService {
 				.build();
 	}
 
+
+	//		// 회원의 전화번호 유무 확인
+//		if (member.getPhone() == null || member.getPhone().isEmpty()) {
+//			;
+//		}
+
+	//		// 예약 목록 조회
+//		List<Reservation> reservations = reservationRepository.findByMemberId(memberId);
+//
+//		// 예약이 없을 경우 예외 처리
+//		if (reservations.isEmpty()) {
+//			throw new ToucheeseJwtException(ErrorCode.RESERVATION_NOT_FOUND);
+//		}
+
 	//				.productId(reservation.getProduct().getId())
 //				.studioId(reservation.getStudio().getId())
 //				.memberId(reservation.getMember().getId())
@@ -141,4 +159,28 @@ public class ReservationService {
 //				.addOptions(reservationProductAddOptions.stream()
 //						.map(option -> option.getProductAddOption().getId())
 //						.collect(Collectors.toList()))
+
+	// System.out.println("예약 수: " + reservations.size());
+
+//		reservations.stream()
+//				.filter(reservation -> {
+//					boolean hasPhone = reservation.getPhone() != null && !reservation.getPhone().trim().isEmpty();
+//					if (!hasPhone) {
+//						System.out.println("전화번호가 없는 예약 ID: " + reservation.getId());
+//					}
+//					return hasPhone;
+//				})
+//				.findFirst();
+
+	//		System.out.println("저장할 전화번호: " + reservationRequest.phone());
+
+//		// 전화번호가 있는 예약을 찾기
+//		Optional<Reservation> reservationWithPhone = reservations.stream()
+//				.filter(reservation -> reservation.getPhone() != null && !reservation.getPhone().trim().isEmpty())
+//				.findFirst();
+
+//		// 전화번호가 있는 예약이 없을 경우 예외 처리
+//		if (reservationWithPhone.isEmpty()) {
+//			throw new ToucheeseJwtException(ErrorCode.DONT_HAVE_PHONE_NUMBER);
+//		}
 }
