@@ -1,15 +1,11 @@
 package com.toucheese.member.controller;
 
+import java.io.IOException;
 import java.security.Principal;
 
+import com.toucheese.member.service.AppleAuthService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.toucheese.global.data.SuccessResponse;
 import com.toucheese.global.util.PrincipalUtils;
@@ -33,7 +29,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/v1/members")
 @Tag(name = "회원 API")
 public class MemberController {
-
     private final MemberService memberService;
 
     /**
@@ -83,6 +78,7 @@ public class MemberController {
         memberService.deleteMember(memberId);
         return SuccessResponse.deletedSuccess("회원 탈퇴가 완료되었습니다.");
     }
+
 
     @GetMapping("/email")
     @Operation(summary = "이메일 찾기")
