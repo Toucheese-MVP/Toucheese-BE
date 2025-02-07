@@ -3,23 +3,15 @@ FROM eclipse-temurin:17 as build
 WORKDIR /app
 COPY . .
 
-COPY gradlew gradlew.bat settings.gradle build.gradle gradle.properties ./
-COPY gradle ./gradle
-
+# Gradle 빌드 실행
 RUN chmod +x ./gradlew
-RUN ./gradlew dependencies --no-daemon
+RUN ./gradlew clean bootJar --stacktrace && mv build/libs/*.jar app.jar
 
-COPY . .
-RUN ./gradlew clean bootJar --no-daemon --stacktrace
-
-RUN ls -l build/libs/
-
-RUN mv $(find build/libs -maxdepth 1 -name "*.jar" ! -name "*plain.jar" | head -n 1) app.jar
-
+# 여기부터 새로운 Stage
 FROM eclipse-temurin:17-jre
 
 WORKDIR /app
-
+# build stage에 만들었던 app.jar를 복사해온다.
 COPY --from=build /app/app.jar .
 
 CMD ["java", "-jar", "app.jar"]
