@@ -121,7 +121,7 @@ public class AuthController {
 	}
 
 	@DeleteMapping("/apple/withdraw")
-	@Operation(summary = "[애플] 회원 탈퇴")
+	@Operation(summary = "[애플] 회원 탈퇴", description = "요청 시 헤더에 access token 필요")
 	public ResponseEntity<?> withdrawAppleMember(Principal principal, @RequestParam String authorizationCode) throws IOException {
 		Long memberId = PrincipalUtils.extractMemberId(principal);
 
