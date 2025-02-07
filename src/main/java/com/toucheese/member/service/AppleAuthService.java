@@ -14,6 +14,7 @@ import com.toucheese.member.entity.Member;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 import javax.naming.AuthenticationException;
@@ -21,6 +22,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -39,11 +41,13 @@ public class AppleAuthService {
             AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException
     {
         AppleMember appleMember = getAppleMemberInfo(appleAuthRequest.idToken()).block();
-
         assert appleMember != null;
         Member member = memberService.findOrCreateMember(appleMember);
 
         String deviceId = appleAuthRequest.deviceId();
+        if (!StringUtils.hasText(deviceId)) {
+            deviceId = UUID.randomUUID().toString();
+        }
         TokenDTO tokenDTO = tokenService.loginMemberToken(member, deviceId);
 
         return new SocalLoginCombinedResponse(SocialLoginResponse.from(member, tokenDTO), tokenDTO.accessToken());
