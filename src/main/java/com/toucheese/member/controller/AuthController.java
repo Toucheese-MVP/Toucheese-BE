@@ -2,21 +2,18 @@ package com.toucheese.member.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.toucheese.global.data.ErrorResponse;
+import com.toucheese.global.util.PrincipalUtils;
 import com.toucheese.member.dto.AppleAuthRequest;
 import com.toucheese.member.service.AppleAuthService;
 import com.toucheese.member.dto.*;
+import com.toucheese.member.service.MemberService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.toucheese.global.data.SuccessResponse;
 import com.toucheese.member.service.KakaoAuthService;
@@ -28,7 +25,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.naming.AuthenticationException;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
 import java.security.spec.InvalidKeySpecException;
 
 @Slf4j
@@ -37,6 +36,7 @@ import java.security.spec.InvalidKeySpecException;
 @RequestMapping("/v1/auth")
 @Tag(name = "인증 API")
 public class AuthController {
+	private final MemberService memberService;
 	private final KakaoAuthService kakaoAuthService;
 	private final AppleAuthService appleAuthService;
 
@@ -118,5 +118,15 @@ public class AuthController {
 		return SuccessResponse.accessTokenResponse(
 				socalLoginCombinedResponse.socialLoginResponse(),
 				socalLoginCombinedResponse.accessToken());
+	}
+
+	@DeleteMapping("/apple/withdraw")
+	@Operation(summary = "[애플] 회원 탈퇴")
+	public ResponseEntity<?> withdrawAppleMember(Principal principal, @RequestParam String authorizationCode) throws IOException {
+		Long memberId = PrincipalUtils.extractMemberId(principal);
+
+		memberService.deleteMember(memberId);
+		appleAuthService.revokeAppleAccessToken(authorizationCode);
+		return SuccessResponse.deletedSuccess("애플 회원 탈퇴가 완료되었습니다.");
 	}
 }
