@@ -41,6 +41,7 @@ public record ReservationRequest(
                 .productId(reservation.getProduct().getId())
                 .studioId(reservation.getStudio().getId())
                 .memberId(reservation.getMember().getId())
+                .phone(reservation.getPhone())
                 .totalPrice(reservation.getTotalPrice())
                 .createDate(reservation.getCreateDate())
                 .createTime(reservation.getCreateTime())
