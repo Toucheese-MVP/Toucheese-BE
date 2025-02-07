@@ -1,18 +1,26 @@
-FROM gradle:8.5-jdk17 AS build
-WORKDIR /app
+FROM eclipse-temurin:17 as build
 
-COPY build.gradle.kts settings.gradle.kts gradle.properties ./
+WORKDIR /app
+COPY . .
+
+COPY gradlew gradlew.bat settings.gradle build.gradle gradle.properties ./
 COPY gradle ./gradle
-RUN gradle dependencies --no-daemon
+
+RUN chmod +x ./gradlew
+RUN ./gradlew dependencies --no-daemon
 
 COPY . .
-RUN chmod +x ./gradlew
-RUN ./gradlew clean bootJar --stacktrace
+RUN ./gradlew clean bootJar --no-daemon --stacktrace
+
 RUN ls -l build/libs/
-RUN mv build/libs/*.jar app.jar
+
+RUN mv $(find build/libs -maxdepth 1 -name "*.jar" ! -name "*plain.jar" | head -n 1) app.jar
 
 FROM eclipse-temurin:17-jre
+
 WORKDIR /app
+
 COPY --from=build /app/app.jar .
+
 CMD ["java", "-jar", "app.jar"]
 EXPOSE 8080
