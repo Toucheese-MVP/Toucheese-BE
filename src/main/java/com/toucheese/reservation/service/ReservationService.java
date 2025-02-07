@@ -3,8 +3,11 @@ package com.toucheese.reservation.service;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.toucheese.global.exception.ErrorCode;
+import com.toucheese.global.exception.ToucheeseJwtException;
 import com.toucheese.member.service.MemberService;
 import com.toucheese.reservation.dto.ReservationRequest;
 import com.toucheese.reservation.dto.ReservationSuccessResponse;
@@ -75,6 +78,7 @@ public class ReservationService {
 
 	@Transactional
 	public ReservationSuccessResponse createInstantReservation(Long memberId, ReservationRequest reservationRequest) {
+
 		List<ProductAddOption> productAddOptions = productService.findProductAddOptionsByProductIdAndAddOptionIds(
 				reservationRequest.productId(), reservationRequest.addOptions()
 		);
@@ -87,6 +91,25 @@ public class ReservationService {
 						))
 						.collect(Collectors.toList());
 
+		// 회원 ID에 대한 예약 목록 조회
+		List<Reservation> reservations = reservationRepository.findByMemberId(memberId);
+
+		// 예약이 없을 경우 예외 처리
+		if (reservations.isEmpty()) {
+			throw new ToucheeseJwtException(ErrorCode.DONT_HAVE_RESERVATION);
+		}
+
+		// 전화번호가 있는 예약을 찾기
+		Optional<Reservation> reservationWithPhone = reservations.stream()
+				.filter(reservation -> reservation.getPhone() != null && !reservation.getPhone().isEmpty())
+				.findFirst();
+
+		// 전화번호가 있는 예약이 없을 경우 예외 처리
+		if (reservationWithPhone.isEmpty()) {
+			throw new ToucheeseJwtException(ErrorCode.DONT_HAVE_PHONE_NUMBER);
+		}
+
+		// 새로운 예약 생성
 		Reservation reservation = Reservation.builder()
 				.product(productService.findProductById(reservationRequest.productId()))
 				.studio(studioService.findStudioById(reservationRequest.studioId()))
@@ -102,8 +125,13 @@ public class ReservationService {
 				.build();
 
 		reservationRepository.save(reservation);
+
 		return ReservationSuccessResponse.builder()
-//				.productId(reservation.getProduct().getId())
+				.status(true)
+				.build();
+	}
+
+	//				.productId(reservation.getProduct().getId())
 //				.studioId(reservation.getStudio().getId())
 //				.memberId(reservation.getMember().getId())
 //				.totalPrice(reservation.getTotalPrice())
@@ -113,7 +141,4 @@ public class ReservationService {
 //				.addOptions(reservationProductAddOptions.stream()
 //						.map(option -> option.getProductAddOption().getId())
 //						.collect(Collectors.toList()))
-				.status(true)
-				.build();
-	}
 }
