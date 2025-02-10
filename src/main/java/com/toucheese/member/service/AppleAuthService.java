@@ -163,7 +163,7 @@ public class AppleAuthService {
 
     }
 
-    public void revokeAppleAccessToken(String authorizationCode) throws IOException {
+    public boolean revoke(String authorizationCode) throws IOException {
         try {
             AppleAuthTokenResponse appleAuthToken = generateAuthToken(authorizationCode);
             if (!StringUtils.hasText(appleAuthToken.accessToken())) {
@@ -177,6 +177,7 @@ public class AppleAuthService {
                 headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
                 HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
                 restTemplate.postForEntity(revokeUrl, httpEntity, String.class);
+                return true;
             } else {
                 throw new ToucheeseJwtException(ErrorCode.INVALID_APPLE_ACCESS_TOKEN);
             }
