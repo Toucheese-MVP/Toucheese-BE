@@ -57,7 +57,7 @@ public class TokenController implements TokenApi {
     public ResponseEntity<?> logout(Principal principal, @RequestParam String deviceId) {
         Long memberId = PrincipalUtils.extractMemberId(principal);
         tokenService.logout(memberId, deviceId);
-        return SuccessResponse.deletedSuccess("로그아웃이 완료되었습니다.");
+        return SuccessResponse.deletedSuccess("회원 로그아웃이 완료되었습니다.");
     }
 
 

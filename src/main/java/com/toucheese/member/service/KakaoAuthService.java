@@ -2,7 +2,9 @@ package com.toucheese.member.service;
 
 import java.util.Map;
 
+import com.toucheese.global.exception.ErrorCode;
 import com.toucheese.global.exception.ToucheeseBadRequestException;
+import com.toucheese.global.exception.ToucheeseJwtException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -146,14 +148,14 @@ public class KakaoAuthService {
 					.block();
 
 			if (response != null && response.getStatusCode().is2xxSuccessful()) {
-				log.info("Kakao account successfully unlinked.");
+				log.info("카카오 서버 unlink 요청 성공");
 				return true;
 			} else {
-				throw new ToucheeseBadRequestException("카카오 계정 탈퇴 요청에 실패했습니다.");
+				throw new ToucheeseJwtException(ErrorCode.KAKAO_WITHDRAW_FAIL);
 			}
 		} catch (Exception e) {
-			log.error("Kakao unlink failed", e);
-			throw new ToucheeseBadRequestException("카카오 계정 탈퇴 처리 중 오류가 발생했습니다.");
+			log.error("카카오 서버 unlink 요청 실패 : ", e);
+			throw new ToucheeseJwtException(ErrorCode.KAKAO_WITHDRAW_FAIL);
 		}
 	}
 }
