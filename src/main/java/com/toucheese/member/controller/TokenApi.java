@@ -25,7 +25,8 @@ public interface TokenApi {
                     @ApiResponse(
                             responseCode = "200",
                             description = "재발급된 토큰 반환",
-                            content = @Content(mediaType = "application/json",
+                            content = @Content(
+                                    mediaType = "application/json",
                                     schema = @Schema(implementation = LoginResponse.class)
                             )
                     ),
@@ -58,14 +59,18 @@ public interface TokenApi {
                     @ApiResponse(
                             responseCode = "200",
                             description = "성공적으로 로그아웃되었습니다.",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessResponse.class))
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = SuccessResponse.class),
+                                    examples = @ExampleObject(value = "회원 로그아웃이 완료되었습니다.")
+                            )
                     ),
                     @ApiResponse(
                             responseCode = "401",
                             description = "로그아웃에 실패하였습니다.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = ErrorResponse.class),
-                                    examples = @ExampleObject("\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4017,\n    \"message\": \"로그아웃에 실패하였습니다.\"\n  }\n")
+                                    examples = @ExampleObject("{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4017,\n    \"message\": \"로그아웃에 실패하였습니다.\"\n  }\n}")
                             )
                     )
             }

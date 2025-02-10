@@ -26,7 +26,8 @@ public enum ErrorCode {
     FAIL_TO_LOAD_PRIVATE_KEY(4014, HttpStatus.INTERNAL_SERVER_ERROR, "Apple private 키를 가져오는데 실패하였습니다."),
     INVALID_APPLE_ACCESS_TOKEN(4015, HttpStatus.BAD_REQUEST, "애플 액세스 토큰이 유효하지 않습니다."),
     APPLE_REVOKE_TOKEN_FAIL(4016, HttpStatus.INTERNAL_SERVER_ERROR, "애플 액세스 토큰 무효화에 실패하였습니다."),
-    LOGOUT_UNAUTHORIZED_ACCESS(4017, HttpStatus.UNAUTHORIZED, "로그아웃에 실패하였습니다.")      
+    LOGOUT_UNAUTHORIZED_ACCESS(4017, HttpStatus.UNAUTHORIZED, "로그아웃에 실패하였습니다."),
+    KAKAO_WITHDRAW_FAIL(4018, HttpStatus.INTERNAL_SERVER_ERROR, "카카오 회원 탈퇴에 실패했습니다.")
     ;
 
 
