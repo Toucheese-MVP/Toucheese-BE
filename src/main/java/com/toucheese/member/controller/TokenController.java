@@ -25,44 +25,17 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @RequestMapping("/v1/tokens")
 @Tag(name = "토큰 API")
-public class TokenController {
+public class TokenController implements TokenApi {
 
     private final TokenService tokenService;
 
     /**
-     * 토큰 재발급을 처리하는 API
+     * 토큰 재발급을 처리 API
+     *
      * @param reissueRequest 로그인 검증을 위한 RefreshToken, DeviceId 정보
      * @return 재발급 된 AccessToken 및 로그인 정보
      */
     @PostMapping("/reissue")
-    @Operation(summary = "토큰 재발급", description = "만료된 AccessToken을 재발급 합니다.",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "재발급된 토큰 반환",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = LoginResponse.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Refresh 토큰 만료",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = ErrorResponse.class),
-                                    examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4001,\n    \"message\": \"Refresh 토큰이 만료되었습니다, 재로그인이 필요합니다.\"\n  }\n}")
-                            )
-                    ),
-
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "deviceId에 해당하는 토큰을 찾을 수 없음",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = ErrorResponse.class),
-                                    examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4004,\n    \"message\": \"deviceId에 해당하는 토큰을 찾을 수 없습니다.\"\n  }\n}")
-                            )
-                    )
-            }
-    )
     public ResponseEntity<LoginResponse> reissueToken(
             @RequestBody @Valid ReissueRequest reissueRequest
     ) {
@@ -73,11 +46,16 @@ public class TokenController {
         );
     }
 
+    /**
+     * 로그아웃 API
+     *
+     * @param principal 인증된 사용자
+     * @param deviceId 디바이스 ID
+     * @return 로그아웃 처리
+     */
     @DeleteMapping("/logout")
-    @Operation(summary = "회원 로그아웃", description = "요청 시 헤더에 access token 필요")
     public ResponseEntity<?> logout(Principal principal, @RequestParam String deviceId) {
         Long memberId = PrincipalUtils.extractMemberId(principal);
-
         tokenService.logout(memberId, deviceId);
         return SuccessResponse.deletedSuccess("로그아웃이 완료되었습니다.");
     }
