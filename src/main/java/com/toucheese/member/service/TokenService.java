@@ -159,9 +159,9 @@ public class TokenService {
 
 
     /**
-     *
-     * @param memberId
-     * @param deviceId
+     * 로그아웃 처리 메서드
+     * @param memberId 회원 ID
+     * @param deviceId 다바이스 ID
      */
     public void logout(Long memberId, String deviceId) {
         Token token = tokenRepository.findByMemberIdAndDeviceId(memberId, deviceId)

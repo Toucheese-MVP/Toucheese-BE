@@ -130,7 +130,10 @@ public class KakaoAuthService {
 	}
 
 
-	public boolean unlink(String accessToken) {
+	public boolean unlink(String code) {
+		SocialLoginRequest socialLoginRequest = getAccessTokenFromKakao(code);
+		String accessToken = socialLoginRequest.accessToken();
+
 		String url = "https://kapi.kakao.com/v1/user/unlink";
 		try {
 			// 카카오 탈퇴 API 호출
