@@ -38,7 +38,30 @@ public interface AuthApi {
     ResponseEntity<SocialLoginResponse> kakaoCallback(@RequestParam String code);
 
     @DeleteMapping("/kakao/withdraw")
-    @Operation(summary = "[카카오] 회원 탈퇴", description = "요청 시 헤더에 access token 필요")
+    @Operation(
+            summary = "[카카오] 회원 탈퇴",
+            description = "요청 시 헤더에 access token 필요",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "성공적으로 탈퇴 처리되었습니다.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = SuccessResponse.class),
+                                    examples = @ExampleObject(value = "카카오 회원 탈퇴가 완료되었습니다.")
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "카카오 탈퇴 처리 중 오류 발생",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"errorCode\": 4010,\n    \"errorMessage\": \"카카오 회원 탈퇴에 실패했습니다.\"\n  }\n}")
+                            )
+                    )
+            }
+    )
     ResponseEntity<?> withdrawKakaoMember(Principal principal, @RequestParam String accessToken) throws IOException;
 
     @Operation(
@@ -85,7 +108,8 @@ public interface AuthApi {
             @ApiResponse(responseCode = "200", description = "애플 회원 탈퇴가 완료되었습니다.",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = SuccessResponse.class)
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(value = "애플 회원 탈퇴가 완료되었습니다.")
                     )),
             @ApiResponse(responseCode = "400", description = "애플 액세스 토큰이 유효하지 않음",
                     content = @Content(
