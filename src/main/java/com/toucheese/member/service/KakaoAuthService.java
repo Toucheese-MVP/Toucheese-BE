@@ -5,6 +5,8 @@ import java.util.Map;
 import com.toucheese.global.exception.ToucheeseBadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -85,6 +87,7 @@ public class KakaoAuthService {
 			});
 	}
 
+
 	/**
 	 * 카카오 Access Token 요청
 	 * @param code 인증 코드
@@ -123,6 +126,34 @@ public class KakaoAuthService {
 		}
 		if (!response.containsKey("access_token") || !response.containsKey("id_token")) {
 			throw new ToucheeseBadRequestException("카카오 응답에 필요한 필드가 포함되지 않았습니다: " + response);
+		}
+	}
+
+
+	public boolean unlink(String code) {
+		SocialLoginRequest socialLoginRequest = getAccessTokenFromKakao(code);
+		String accessToken = socialLoginRequest.accessToken();
+
+		String url = "https://kapi.kakao.com/v1/user/unlink";
+		try {
+			// 카카오 탈퇴 API 호출
+			ResponseEntity<String> response = kakaoApiClient
+					.method(HttpMethod.POST)
+					.uri(url)
+					.headers(headers -> headers.setBearerAuth(accessToken))
+					.retrieve()
+					.toEntity(String.class)
+					.block();
+
+			if (response != null && response.getStatusCode().is2xxSuccessful()) {
+				log.info("Kakao account successfully unlinked.");
+				return true;
+			} else {
+				throw new ToucheeseBadRequestException("카카오 계정 탈퇴 요청에 실패했습니다.");
+			}
+		} catch (Exception e) {
+			log.error("Kakao unlink failed", e);
+			throw new ToucheeseBadRequestException("카카오 계정 탈퇴 처리 중 오류가 발생했습니다.");
 		}
 	}
 }
