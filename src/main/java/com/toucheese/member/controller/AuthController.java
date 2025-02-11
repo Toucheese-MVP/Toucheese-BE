@@ -38,6 +38,7 @@ public class AuthController implements AuthApi {
 	 * @param socialLoginRequest 클라이언트에서 전달된 카카오 토큰 정보
 	 * @return 사용자 정보 및 JWT
 	 */
+	@PostMapping("/kakao")
 	public ResponseEntity<SocialLoginResponse> kakaoLogin(@Valid @RequestBody SocialLoginRequest socialLoginRequest) {
 		SocalLoginCombinedResponse socalLoginCombinedResponse = kakaoAuthService.handleKakaoLogin(socialLoginRequest);
 
@@ -52,6 +53,7 @@ public class AuthController implements AuthApi {
 	 * @param code 카카오에서 리다이렉트된 인증 코드
 	 * @return 사용자 정보와 JWT
 	 */
+	@GetMapping("/kakao/callback")
 	public ResponseEntity<SocialLoginResponse> kakaoCallback(@RequestParam String code) {
 		SocialLoginRequest socialLoginRequest = kakaoAuthService.getAccessTokenFromKakao(code);
 
@@ -69,6 +71,7 @@ public class AuthController implements AuthApi {
 	 * @param code 카카오에서 리다이렉트된 인증 코드
 	 * @return 탈퇴 처리
 	 */
+	@DeleteMapping("/kakao/withdraw")
 	public ResponseEntity<?> withdrawKakaoMember(Principal principal, @RequestParam String code) {
 		Long memberId = PrincipalUtils.extractMemberId(principal);
 		if (kakaoAuthService.unlink(code)) {
