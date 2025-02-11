@@ -169,6 +169,7 @@ public class TokenService {
         if (!token.getMember().getId().equals(memberId)) {
             throw new ToucheeseJwtException(ErrorCode.LOGOUT_UNAUTHORIZED_ACCESS);
         }
-        tokenRepository.delete(token);
+        token.updateRefreshToken(null);
+        tokenRepository.save(token);
     }
 }
