@@ -3,7 +3,7 @@ package com.toucheese.member.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.toucheese.global.data.ErrorResponse;
 import com.toucheese.global.data.SuccessResponse;
-import com.toucheese.member.dto.AppleAuthRequest;
+import com.toucheese.member.dto.AppleLoginRequest;
 import com.toucheese.member.dto.SocialLoginRequest;
 import com.toucheese.member.dto.SocialLoginResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +39,7 @@ public interface AuthApi {
 
     @DeleteMapping("/kakao/withdraw")
     @Operation(
-            summary = "[카카오] 회원 탈퇴",
+            summary = "카카오 회원 탈퇴",
             description = "요청 시 헤더에 access token 필요",
             responses = {
                     @ApiResponse(
@@ -64,65 +64,128 @@ public interface AuthApi {
     )
     ResponseEntity<?> withdrawKakaoMember(Principal principal, @RequestParam String accessToken) throws IOException;
 
+    @PostMapping("/apple")
     @Operation(
             summary = "애플 로그인 처리",
             description = """
-					애플 OAuth 인증 후 전달받은 id Token으로 사용자 정보를 추출후 사용자 정보와 JWT 토큰 발급하여 반환합니다. \n
-					JWT Access Token은 Response Header로 반환합니다."""
+					애플 OAuth 인증 후 전달받은 id Token 으로 사용자 정보를 추출후 사용자 정보와 JWT 토큰 발급하여 반환합니다. \n
+					JWT Access Token은 Response Header로 반환합니다.""",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "[Apple Login] 로그인 성공",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = SocialLoginResponse.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "4008",
+                            description = "[Apple Login] ID 토큰이 유효하지 않습니다. (statusCode = 400)",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4008,\n    \"message\": \"ID 토큰이 유효하지 않습니다.\"\n  }\n}")
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "4009",
+                            description = "[Apple Login] IdToken 헤더 파싱에 실패했습니다. (statusCode = 400)",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4009,\n    \"message\": \"IdToken 헤더 파싱에 실패했습니다.\"\n  }\n}")
+                            )
+                    )
+            }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "[Apple Login] 로그인 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = SocialLoginResponse.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "4008",
-                    description = "[Apple Login] ID 토큰이 유효하지 않습니다. (statusCode 는 400 입니다)",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4008,\n    \"message\": \"ID 토큰이 유효하지 않습니다.\"\n  }\n}")
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "4009",
-                    description = "[Apple Login] IdToken 헤더 파싱에 실패했습니다. (statusCode 는 400 입니다)",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4009,\n    \"message\": \"IdToken 헤더 파싱에 실패했습니다.\"\n  }\n}")
-                    )
-            )
-    })
-    @PostMapping("/apple")
-    ResponseEntity<SocialLoginResponse> appleLogin(@Valid @RequestBody AppleAuthRequest appleAuthRequest)
+    ResponseEntity<SocialLoginResponse> appleLogin(@Valid @RequestBody AppleLoginRequest appleAuthRequest)
             throws AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException;
 
+
+    @GetMapping("/apple/callback")
+    @Operation(
+            summary = "애플 로그인 콜백 처리",
+            description = """
+					애플 OAuth 인증 후 전달받은 Authorization Code 로 사용자 정보를 추출한 후 사용자 정보와 JWT 토큰 발급하여 반환합니다. \n
+					JWT Access Token은 Response Header로 반환합니다.""",
+            responses = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "애플 로그인 콜백 처리 완료",
+                        content = @Content(
+                                mediaType = "application/json",
+                                schema = @Schema(implementation = SuccessResponse.class)
+                        )
+                ),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "애플 Authorization Code 가 만료되었습니다",
+                        content = @Content(
+                                mediaType = "application/json",
+                                schema = @Schema(implementation = ErrorResponse.class),
+                                examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4019,\n    \"message\": \"Authorization Code 가 만료되었습니다.\"\n  }\n}")
+                        )
+                ),
+                @ApiResponse(
+                        responseCode = "502",
+                        description = "애플 서버로의 인증 토큰 요청 실패하였습니다.",
+                        content = @Content(
+                                mediaType = "application/json",
+                                schema = @Schema(implementation = ErrorResponse.class),
+                                examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4013,\n    \"message\": \"애플 서버로의 인증 토큰 요청에 실패하였습니다.\"\n  }\n}")
+                        )
+                ),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "애플 private 키를 가져오는데 실패하였습니다.",
+                        content = @Content(
+                                mediaType = "application/json",
+                                schema = @Schema(implementation = ErrorResponse.class),
+                                examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4014,\n    \"message\": \"애플 private 키를 가져오는데 실패하였습니다.\"\n  }\n}")
+                        )
+                )
+
+            }
+    )
+    ResponseEntity<?> appleCallback(@RequestParam String code) throws IOException, AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException;
+
     @DeleteMapping("/apple/withdraw")
-    @Operation(summary = "[애플] 회원 탈퇴", description = "요청 시 헤더에 access token 필요")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "애플 회원 탈퇴가 완료되었습니다.",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = SuccessResponse.class),
-                            examples = @ExampleObject(value = "애플 회원 탈퇴가 완료되었습니다.")
-                    )),
-            @ApiResponse(responseCode = "400", description = "애플 액세스 토큰이 유효하지 않음",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4015,\n    \"message\": \"애플 액세스 토큰이 유효하지 않습니다.\"\n  }\n}")
-                    )),
-            @ApiResponse(responseCode = "500", description = "서버 오류: 애플 서버 통신 실패 (액세스 토큰 무효화 실패)",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4016,\n    \"message\": \"애플 액세스 토큰 무효화에 실패하였습니다.\"\n  }\n}")
-                    ))
-    })
+    @Operation(
+            summary = "애플 회원 탈퇴",
+            description = "요청 시 헤더에 access token 필요",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "애플 회원 탈퇴가 완료되었습니다.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = SuccessResponse.class),
+                                    examples = @ExampleObject(value = "애플 회원 탈퇴가 완료되었습니다.")
+                            )),
+                    @ApiResponse(responseCode = "400", description = "애플 액세스 토큰이 유효하지 않음",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4015,\n    \"message\": \"애플 Access Token 이 유효하지 않습니다.\"\n  }\n}")
+                            )),
+                    @ApiResponse(responseCode = "400", description = "애플 Authorization Code 가 만료되었습니다",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4019,\n    \"message\": \"Authorization Code 가 만료되었습니다.\"\n  }\n}")
+                            )),
+                    @ApiResponse(responseCode = "500", description = "애플 서버로의 인증 토큰 요청에 실패하였습니다.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4013,\n    \"message\": \"애플 서버로의 인증 토큰 요청에 실패하였습니다.\"\n  }\n}")
+                            )),
+                    @ApiResponse(responseCode = "500", description = "애플 private 키를 가져오는데 실패하였습니다.",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4014,\n    \"message\": \"애플 private 키를 가져오는데 실패하였습니다.\"\n  }\n}")
+                            ))
+            }
+    )
     ResponseEntity<?> withdrawAppleMember(Principal principal, @RequestParam String authorizationCode) throws IOException;
 }

@@ -1,6 +1,6 @@
 package com.toucheese.member.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.toucheese.global.exception.ErrorCode;
 import com.toucheese.global.exception.ToucheeseJwtException;
 import com.toucheese.global.util.JwtTokenProvider;
@@ -8,24 +8,21 @@ import com.toucheese.member.dto.*;
 import com.toucheese.member.client.AppleAuthClient;
 import com.toucheese.member.util.ApplePublicKeyGenerator;
 import com.toucheese.member.entity.Member;
+import feign.FeignException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 import reactor.core.publisher.Mono;
 
 import javax.naming.AuthenticationException;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -61,77 +58,102 @@ public class AppleAuthService {
     @Value("${apple.auth.audience}")
     private String audience;
 
-    @Value("${apple.revoke-url}")
-    private String revokeUrl;
-
-    @Value("${apple.token-url}")
-    private String tokenUrl;
+    @Value("${apple.auth.redirect-uri}")
+    private String redirectUrl;
 
 
-    public ApplePublicKeyResponse getAppleAuthPublicKey() {
-        return appleAuthClient.getAppleAuthPublicKey();
-    }
-
-    public SocalLoginCombinedResponse handleAppleLogin(AppleAuthRequest appleAuthRequest) throws
-            AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException {
-        AppleMember appleMember = getAppleMemberInfo(appleAuthRequest.idToken()).block();
-
+    /**
+     * Apple 로그인 요청을 처리하는 메서드
+     */
+    public SocalLoginCombinedResponse handleAppleLogin(AppleLoginRequest appleAuthRequest) throws AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException {
+        AppleMember appleMember = getAppleMemberInfo(appleAuthRequest.idToken());
         Member member = memberService.findOrCreateMember(appleMember);
-
         String deviceId = appleAuthRequest.deviceId();
         TokenDTO tokenDTO = tokenService.loginMemberToken(member, deviceId);
 
         return new SocalLoginCombinedResponse(SocialLoginResponse.from(member, tokenDTO), tokenDTO.accessToken());
     }
 
-    public Mono<AppleMember> getAppleMemberInfo(String identityToken) throws
-            AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException {
+    /**
+     * Apple 의 공개키를 가져오는 메서드
+     */
+    public ApplePublicKeyResponse getAppleAuthPublicKey() {
+        return appleAuthClient.getAppleAuthPublicKey();
+    }
+
+    /**
+     * Apple ID Token 을 기반으로 회원 정보를 추출하는 메서드
+     */
+    public AppleMember getAppleMemberInfo(String identityToken) throws AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException {
         Map<String, String> headers = jwtTokenProvider.parseHeaders(identityToken);
         PublicKey publicKey = applePublicKeyGenerator.generatePublicKey(headers, getAppleAuthPublicKey());
         Claims claims = jwtTokenProvider.getTokenClaims(identityToken, publicKey);
 
-        return Mono.just(new AppleMember(
+        return new AppleMember(
                 claims.getSubject(), // Apple userID
                 (String) claims.get("name.firstName") + claims.get("name.lastName"),
                 (String) claims.get("email")
-        ));
+        );
     }
 
-    public AppleAuthTokenResponse generateAuthToken(String authorizationCode) throws IOException {
-        LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("code", authorizationCode);
-        params.add("client_id", clientId);
-        params.add("client_secret", createClientSecret());
-        params.add("grant_type", "authorization_code");
-
-        // 요청 헤더 설정
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-
-        // HttpEntity 설정
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers);
-
-        // RestTemplate을 사용하여 애플 서버로 요청
-        RestTemplate restTemplate = new RestTemplate();
-        try {
-            ResponseEntity<AppleAuthTokenResponse> response = restTemplate.postForEntity(
-                    tokenUrl,
-                    requestEntity,
-                    AppleAuthTokenResponse.class
-            );
-            if (response.getStatusCode() == HttpStatus.OK) {
-                return response.getBody();
-            } else {
-                throw new ToucheeseJwtException(ErrorCode.APPLE_AUTH_TOKEN_FAIL);
-            }
-        } catch (HttpClientErrorException e) {
-            log.error(String.valueOf(e));
-            throw new ToucheeseJwtException(ErrorCode.APPLE_AUTH_TOKEN_FAIL);
+    /**
+     * Apple 서버 토큰 요청
+     */
+    private AppleAuthTokenResponse requestAppleToken(String code, boolean forLogin) throws IOException {
+        AppleTokenRequest.AppleTokenRequestBuilder requestBuilder = AppleTokenRequest.builder()
+                .code(code)
+                .clientId(clientId)
+                .clientSecret(createClientSecret())
+                .grantType("authorization_code");
+        if (forLogin) {
+            requestBuilder.redirectUri(redirectUrl);
         }
-
+        return appleAuthClient.getAppleToken(requestBuilder.build());
     }
 
+    /**
+     * Apple 로그인 콜백용 토큰 요청하는 메서드
+     */
+    public AppleLoginRequest getAppleTokenForCallback(String code) throws IOException {
+        AppleAuthTokenResponse response = requestAppleToken(code, true);
+        return AppleLoginRequest.builder()
+                .platform("APPLE")
+                .idToken(response.idToken())
+                .build();
+    }
+
+
+    /**
+     * Apple 회원 탈퇴용 토큰을 요청하는 메서드
+     */
+    public AppleAuthTokenResponse getAppleTokenForRevoke(String code) throws IOException {
+        return requestAppleToken(code, false);
+    }
+
+
+    /**
+     * Apple 계정 연동 해제 (회원 탈퇴) 요청을 수행하는 메서드
+     */
+    public boolean revoke(String authorizationCode) throws IOException {
+        AppleAuthTokenResponse appleAuthToken = getAppleTokenForRevoke(authorizationCode);
+
+        if (StringUtils.hasText(appleAuthToken.accessToken())) {
+            AppleRevokeRequest revokeRequest = AppleRevokeRequest.builder()
+                    .clientId(clientId)
+                    .clientSecret(createClientSecret())
+                    .token(appleAuthToken.accessToken())
+                    .build();
+
+            appleAuthClient.revokeAppleAuthToken(revokeRequest);
+            return true;
+        } else {
+            throw new ToucheeseJwtException(ErrorCode.INVALID_ACCESS_TOKEN);
+        }
+    }
+
+    /**
+     * Apple Client Secret 생성
+     */
     public String createClientSecret() throws IOException {
         Date expirationDate = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
         Map<String, Object> jwtHeader = new HashMap<>();
@@ -147,44 +169,25 @@ public class AppleAuthService {
                 .claim("sub", clientId)
                 .signWith(getPrivateKey(), ES256)
                 .compact();
-
-
     }
 
-    private PrivateKey getPrivateKey() throws IOException{
+    /**
+     * PrivateKey 로드
+     */
+    private PrivateKey getPrivateKey() throws IOException {
         try (FileInputStream fis = new FileInputStream(privateKeyPath)) {
             byte[] keyBytes = fis.readAllBytes();
             KeyFactory keyFactory = KeyFactory.getInstance("EC");
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
             return keyFactory.generatePrivate(keySpec);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+        }
+        catch (FileNotFoundException e) {
+            log.error("Apple Private Key 파일을 찾을 수 없습니다. {}", privateKeyPath, e);
             throw new ToucheeseJwtException(ErrorCode.FAIL_TO_LOAD_PRIVATE_KEY);
         }
-
-    }
-
-    public boolean revoke(String authorizationCode) throws IOException {
-        try {
-            AppleAuthTokenResponse appleAuthToken = generateAuthToken(authorizationCode);
-            if (!StringUtils.hasText(appleAuthToken.accessToken())) {
-                RestTemplate restTemplate = new RestTemplateBuilder().build();
-                LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-                params.add("client_id", clientId);
-                params.add("client_secret", createClientSecret());
-                params.add("token", appleAuthToken.accessToken());
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-                HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
-                restTemplate.postForEntity(revokeUrl, httpEntity, String.class);
-                return true;
-            } else {
-                throw new ToucheeseJwtException(ErrorCode.INVALID_APPLE_ACCESS_TOKEN);
-            }
-        } catch (IOException e) {
-            throw new ToucheeseJwtException(ErrorCode.APPLE_REVOKE_TOKEN_FAIL);
+        catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            log.error("Apple Private Key 파일을 파싱하는데에 문제가 발생했습니다.", e);
+            throw new ToucheeseJwtException(ErrorCode.FAIL_TO_LOAD_PRIVATE_KEY);
         }
-
     }
-
 }
