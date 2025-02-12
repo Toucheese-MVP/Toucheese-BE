@@ -19,10 +19,8 @@ import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 import javax.naming.AuthenticationException;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -175,7 +173,17 @@ public class AppleAuthService {
      * PrivateKey 로드
      */
     private PrivateKey getPrivateKey() throws IOException {
-        try (FileInputStream fis = new FileInputStream(privateKeyPath)) {
+        File file = new File(privateKeyPath);
+        if (!file.exists()) {
+            log.error("private key 파일이 존재하지 않습니다. {}", privateKeyPath);
+            throw new ToucheeseJwtException(ErrorCode.FAIL_TO_LOAD_PRIVATE_KEY);
+        }
+        if (!file.canRead()) {
+            log.error("private key 파일을 읽을 수 없습니다.. {}", privateKeyPath);
+            throw new ToucheeseJwtException(ErrorCode.FAIL_TO_LOAD_PRIVATE_KEY);
+        }
+
+        try (FileInputStream fis = new FileInputStream(file)) {
             byte[] keyBytes = fis.readAllBytes();
             KeyFactory keyFactory = KeyFactory.getInstance("EC");
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
