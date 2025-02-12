@@ -1,8 +1,6 @@
 package com.toucheese.member.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.toucheese.global.util.PrincipalUtils;
-import com.toucheese.member.dto.AppleAuthRequest;
 import com.toucheese.member.service.AppleAuthService;
 import com.toucheese.member.dto.*;
 import com.toucheese.member.service.MemberService;
@@ -83,13 +81,28 @@ public class AuthController implements AuthApi {
 	/**
 	 * 애플 로그인 요청 처리
 	 *
-	 * @param appleAuthRequest 클라이언트에서 전달된 애플 토큰 정보
+	 * @param appleLoginRequest 클라이언트에서 전달된 애플 토큰 정보
 	 * @return 사용자 정보 및 JWT
 	 */
 	@PostMapping("/apple")
-	public ResponseEntity<SocialLoginResponse> appleLogin(@Valid @RequestBody AppleAuthRequest appleAuthRequest)
-			throws AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException, JsonProcessingException {
-		SocalLoginCombinedResponse socalLoginCombinedResponse = appleAuthService.handleAppleLogin(appleAuthRequest);
+	public ResponseEntity<SocialLoginResponse> appleLogin(@Valid @RequestBody AppleLoginRequest appleLoginRequest) throws AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException {
+		SocalLoginCombinedResponse socalLoginCombinedResponse = appleAuthService.handleAppleLogin(appleLoginRequest);
+
+		return SuccessResponse.accessTokenResponse(
+				socalLoginCombinedResponse.socialLoginResponse(),
+				socalLoginCombinedResponse.accessToken());
+	}
+
+	/**
+	 * 애플 로그인 콜백 처리
+	 *
+	 * @param code 애플에서 리다이렉트된 인증 코드
+	 * @return 사용자 정보와 JWT
+	 */
+	@GetMapping("/apple/callback")
+	public ResponseEntity<?> appleCallback(@RequestParam String code) throws IOException, AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException {
+		AppleLoginRequest appleLoginRequest = appleAuthService.getAppleTokenForCallback(code);
+		SocalLoginCombinedResponse socalLoginCombinedResponse = appleAuthService.handleAppleLogin(appleLoginRequest);
 
 		return SuccessResponse.accessTokenResponse(
 				socalLoginCombinedResponse.socialLoginResponse(),
@@ -111,5 +124,4 @@ public class AuthController implements AuthApi {
 		}
 		return SuccessResponse.deletedSuccess("애플 회원 탈퇴가 완료되었습니다.");
 	}
-
 }
