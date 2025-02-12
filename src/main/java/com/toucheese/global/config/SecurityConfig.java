@@ -66,6 +66,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("https://api.toucheese.shop");
+        configuration.addAllowedOrigin("https://toucheese.shop");
         configuration.addAllowedOrigin("http://localhost:3000");
         configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
         configuration.addAllowedHeader("*"); // 모든 헤더 허용
