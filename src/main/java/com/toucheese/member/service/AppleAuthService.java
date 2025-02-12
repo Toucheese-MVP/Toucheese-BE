@@ -13,6 +13,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -20,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 import javax.naming.AuthenticationException;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
@@ -172,29 +175,37 @@ public class AppleAuthService {
     /**
      * PrivateKey 로드
      */
-    private PrivateKey getPrivateKey() throws IOException {
+    public PrivateKey getPrivateKey() {
         File file = new File(privateKeyPath);
-        if (!file.exists()) {
-            log.error("private key 파일이 존재하지 않습니다. {}", privateKeyPath);
-            throw new ToucheeseJwtException(ErrorCode.FAIL_TO_LOAD_PRIVATE_KEY);
-        }
-        if (!file.canRead()) {
-            log.error("private key 파일을 읽을 수 없습니다.. {}", privateKeyPath);
+        if (!file.exists() || !file.canRead()) {
+            log.error("Private key 파일을 읽을 수 없습니다. 경로: {}", privateKeyPath);
             throw new ToucheeseJwtException(ErrorCode.FAIL_TO_LOAD_PRIVATE_KEY);
         }
 
-        try (FileInputStream fis = new FileInputStream(file)) {
-            byte[] keyBytes = fis.readAllBytes();
+        byte[] keyBytes = readPrivateKeyFile(file);
+        return generatePrivateKey(keyBytes);
+    }
+
+    private byte[] readPrivateKeyFile(File file) {
+        try (PemReader pemReader = new PemReader(new FileReader(file, StandardCharsets.UTF_8))) {
+            PemObject pemObject = pemReader.readPemObject();
+            if (pemObject == null) {
+                throw new IOException("PEM 파일이 비어 있거나 올바르지 않습니다.");
+            }
+            return pemObject.getContent();
+        } catch (IOException e) {
+            log.error("Apple Private Key 파일을 읽는 중 오류 발생: {}", privateKeyPath, e);
+            throw new ToucheeseJwtException(ErrorCode.FAIL_TO_LOAD_PRIVATE_KEY);
+        }
+    }
+
+    private PrivateKey generatePrivateKey(byte[] keyBytes) {
+        try {
             KeyFactory keyFactory = KeyFactory.getInstance("EC");
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
             return keyFactory.generatePrivate(keySpec);
-        }
-        catch (FileNotFoundException e) {
-            log.error("Apple Private Key 파일을 찾을 수 없습니다. {}", privateKeyPath, e);
-            throw new ToucheeseJwtException(ErrorCode.FAIL_TO_LOAD_PRIVATE_KEY);
-        }
-        catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            log.error("Apple Private Key 파일을 파싱하는데에 문제가 발생했습니다.", e);
+        } catch (Exception e) {
+            log.error("Apple Private Key 파일을 파싱하는데 문제가 발생했습니다.", e);
             throw new ToucheeseJwtException(ErrorCode.FAIL_TO_LOAD_PRIVATE_KEY);
         }
     }
