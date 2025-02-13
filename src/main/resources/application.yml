@@ -6,6 +6,12 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      show-sql: true
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        highlight_sql: true
   servlet:
     multipart:
       max-file-size: 5MB # 한개 파일의 최대 사이즈 (default: 1MB)
