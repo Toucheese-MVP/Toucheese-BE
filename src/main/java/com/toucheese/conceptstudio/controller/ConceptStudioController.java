@@ -26,10 +26,8 @@ public class ConceptStudioController {
     public ResponseEntity<Page<StudioResponse>> getStudiosByConceptId(
             @PathVariable Long conceptId,
             @RequestParam int page
-            // @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         return SuccessResponse.getObjectSuccess(conceptStudioService.getStudiosByConceptId(conceptId, page));
-        // return ApiResponse.getObjectSuccess(conceptStudioService.getStudiosByConceptId(conceptId, pageable));
     }
 
     /**

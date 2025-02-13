@@ -2,13 +2,13 @@ package com.toucheese.conceptstudio.service;
 
 import java.util.List;
 
+import com.toucheese.conceptstudio.repository.ConceptStudioRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.toucheese.conceptstudio.dto.StudioResponse;
-import com.toucheese.conceptstudio.repository.ConceptStudioRepository;
 import com.toucheese.global.config.ImageConfig;
 import com.toucheese.global.util.PageUtils;
 import com.toucheese.studio.entity.Location;
@@ -23,14 +23,6 @@ public class ConceptStudioService {
 	private final ConceptStudioRepository conceptStudioRepository;
 	private final StudioRepositoryImpl studioRepositoryImpl;
 	private final ImageConfig imageConfig;
-
-//	@Transactional(readOnly = true)
-//	public Page<StudioResponse> getStudiosByConceptId(Long conceptId, int page) {
-//		Pageable pageable = PageUtils.createPageable(page);
-//		return conceptStudioRepository.findByConceptId(conceptId, pageable).map( conceptStudio ->
-//				StudioResponse.of(conceptStudio.getStudio(), imageConfig.getResizedImageBaseUrl())
-//		);
-//	}
 
 	@Transactional(readOnly = true)
 	public Page<StudioResponse> getStudiosByConceptId(Long conceptId, int page) {
