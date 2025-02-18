@@ -80,6 +80,20 @@ public class MemberController {
     }
 
 
+    @DeleteMapping("/cleanup")
+    @Operation(
+        summary = "임시 회원 탈퇴 (회원 데이터 삭제)",
+        description = "회원과 관련된 데이터(장바구니, 예약, 리뷰, 문의 글, 토큰)를 삭제합니다.\n" +
+                "회원 자체는 삭제되지 않으며, 회원이 소셜 로그인으로 가입한 경우에 한하여 해당 데이터를 정리합니다."
+    )
+    public ResponseEntity<?> cleanupMemberData(Principal principal) {
+        Long memberId = PrincipalUtils.extractMemberId(principal);
+
+        memberService.deleteMemberRelatedData(memberId);
+        return SuccessResponse.deletedSuccess("회원 데이터 삭제가 완료되었습니다.");
+    }
+
+
     @GetMapping("/email")
     @Operation(summary = "이메일 찾기")
     public ResponseEntity<String> findEmail(@RequestBody @Valid FindEmailRequest findEmailRequest) {
