@@ -6,7 +6,6 @@ import com.toucheese.global.exception.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.toucheese.global.data.JwtValidateStatus;
 import com.toucheese.global.util.JwtTokenProvider;
 import com.toucheese.member.dto.MemberTokenResponse;
 import com.toucheese.member.dto.ReissueRequest;
@@ -26,6 +25,7 @@ public class TokenService {
 
     /**
      * 토큰 재발급을 위한 메서드
+     *
      * @param reissueRequest 재발급을 위한 검증 정보
      * @return 재발급 된 AccessToken 및 로그인 정보
      */
@@ -33,13 +33,11 @@ public class TokenService {
     public MemberTokenResponse reissueAccessToken(ReissueRequest reissueRequest) {
         String deviceId = reissueRequest.deviceId();
         Token token = findTokenByDeviceId(deviceId);
-
         String refreshToken = token.getRefreshToken();
-        checkRefreshToken(refreshToken, reissueRequest.refreshToken()); // refreshToken 검증
 
+        // 내가 요청 바디에 담은 리프레시 토큰과 deviceId 로 찾은 리프레시 토큰이 다를떄
+        checkRefreshToken(refreshToken, reissueRequest.refreshToken());
         String memberId = jwtTokenProvider.getClaims(refreshToken).getSubject();
-
-        // DENIED, EXPIRED 되지 않았다면 AccessToken 재발급
         Member member = token.getMember();
         String newAccessToken = jwtTokenProvider.createAccessToken(memberId, member.getRole());
 
@@ -59,19 +57,20 @@ public class TokenService {
 
     /**
      * 회원 정보와 기기 정보를 통해 해당되는 토큰을 검색
+     *
      * @param deviceId 기기 아이디
      * @return 토큰 정보
      */
     @Transactional(readOnly = true)
-	public Token findTokenByDeviceId(String deviceId) {
-		return tokenRepository.findByDeviceId(deviceId)
-            // .orElseThrow(ToucheeseUnAuthorizedException::new);
-            .orElseThrow(() -> new ToucheeseJwtException(ErrorCode.TOKEN_NOT_FOUND));
-	}
+    public Token findTokenByDeviceId(String deviceId) {
+        return tokenRepository.findByDeviceId(deviceId)
+                .orElseThrow(() -> new GlobalCustomException(ErrorCode.TOKEN_NOT_FOUND));
+    }
 
     /**
      * 로그인 시 회원 토큰 처리 메서드
-     * @param member 회원 정보
+     *
+     * @param member   회원 정보
      * @param deviceId 기기 아이디
      * @return 기록된 토큰 정보
      */
@@ -92,6 +91,7 @@ public class TokenService {
 
     /**
      * 기기 아이디 검증을 위한 메서드
+     *
      * @param deviceId 기기 아이디
      * @return true / false
      */
@@ -101,7 +101,8 @@ public class TokenService {
 
     /**
      * 새 로그인 시 토큰 저장을 위한 메서드
-     * @param member 회원 정보
+     *
+     * @param member   회원 정보
      * @param deviceId 기기 아이디
      * @param tokenDTO 생성된 토큰 정보
      */
@@ -118,6 +119,7 @@ public class TokenService {
 
     /**
      * AccessToken, RefreshToken 생성 메서드
+     *
      * @param member 회원 정보
      * @return 생성된 토큰
      */
@@ -132,42 +134,30 @@ public class TokenService {
                 .build();
     }
 
-
     /**
-     * RefreshToken 을 검증하기 위한 토큰
-     * @param refreshToken 갱신 토큰
-     * @throws ToucheeseException 갱신 토큰 또한 만료되었을 경우 재로그인 요청
+     * RefreshToken 검증
+     *
+     * @param refreshToken 저장된 리프레시 토큰
+     * @param requestRefreshToken 요청한 리프레시 토큰
      */
     public void checkRefreshToken(String refreshToken, String requestRefreshToken) {
-        JwtValidateStatus jwtValidateStatus = jwtTokenProvider.validateToken(refreshToken);
-
-        if (jwtValidateStatus == JwtValidateStatus.EXPIRED) {
-            // throw new ToucheeseBadRequestException(ErrorCode.EXPIRED_REFRESH_TOKEN);
-            throw new ToucheeseJwtException(ErrorCode.EXPIRED_REFRESH_TOKEN);
-        }
-
-        if (jwtValidateStatus == JwtValidateStatus.DENIED) {
-            // throw new ToucheeseBadRequestException(ErrorCode.INVALID_REFRESH_TOKEN);
-            throw new ToucheeseJwtException(ErrorCode.INVALID_REFRESH_TOKEN);
-        }
-
+        jwtTokenProvider.validateToken(refreshToken, true);
         if (!refreshToken.equals(requestRefreshToken)) {
-            // throw new ToucheeseBadRequestException(ErrorCode.REFRESH_TOKEN_MISMATCH);
-            throw new ToucheeseJwtException(ErrorCode.REFRESH_TOKEN_MISMATCH);
+            throw new GlobalCustomException(ErrorCode.REFRESH_TOKEN_MISMATCH);
         }
     }
 
-
     /**
      * 로그아웃 처리 메서드
+     *
      * @param memberId 회원 ID
      * @param deviceId 다바이스 ID
      */
     public void logout(Long memberId, String deviceId) {
         Token token = tokenRepository.findByMemberIdAndDeviceId(memberId, deviceId)
-                .orElseThrow(() -> new ToucheeseJwtException(ErrorCode.TOKEN_NOT_FOUND));
+                .orElseThrow(() -> new GlobalCustomException(ErrorCode.TOKEN_NOT_FOUND));
         if (!token.getMember().getId().equals(memberId)) {
-            throw new ToucheeseJwtException(ErrorCode.LOGOUT_UNAUTHORIZED_ACCESS);
+            throw new GlobalCustomException(ErrorCode.LOGOUT_UNAUTHORIZED_ACCESS);
         }
         token.updateRefreshToken(null);
         tokenRepository.save(token);

@@ -1,7 +1,7 @@
 package com.toucheese.member.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.toucheese.global.data.ErrorResponse;
+import com.toucheese.global.data.CommonResponse;
 import com.toucheese.global.data.SuccessResponse;
 import com.toucheese.member.dto.AppleLoginRequest;
 import com.toucheese.member.dto.SocialLoginRequest;
@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,7 +55,7 @@ public interface AuthApi {
                             description = "카카오 탈퇴 처리 중 오류 발생",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    schema = @Schema(implementation = CommonResponse.class),
                                     examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"errorCode\": 4010,\n    \"errorMessage\": \"카카오 회원 탈퇴에 실패했습니다.\"\n  }\n}")
                             )
                     )
@@ -84,7 +83,7 @@ public interface AuthApi {
                             description = "[Apple Login] ID 토큰이 유효하지 않습니다. (statusCode = 400)",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    schema = @Schema(implementation = CommonResponse.class),
                                     examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4008,\n    \"message\": \"ID 토큰이 유효하지 않습니다.\"\n  }\n}")
                             )
                     ),
@@ -93,7 +92,7 @@ public interface AuthApi {
                             description = "[Apple Login] IdToken 헤더 파싱에 실패했습니다. (statusCode = 400)",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    schema = @Schema(implementation = CommonResponse.class),
                                     examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4009,\n    \"message\": \"IdToken 헤더 파싱에 실패했습니다.\"\n  }\n}")
                             )
                     )
@@ -123,7 +122,7 @@ public interface AuthApi {
                         description = "애플 Authorization Code 가 만료되었습니다",
                         content = @Content(
                                 mediaType = "application/json",
-                                schema = @Schema(implementation = ErrorResponse.class),
+                                schema = @Schema(implementation = CommonResponse.class),
                                 examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4019,\n    \"message\": \"Authorization Code 가 만료되었습니다.\"\n  }\n}")
                         )
                 ),
@@ -132,7 +131,7 @@ public interface AuthApi {
                         description = "애플 서버로의 인증 토큰 요청 실패하였습니다.",
                         content = @Content(
                                 mediaType = "application/json",
-                                schema = @Schema(implementation = ErrorResponse.class),
+                                schema = @Schema(implementation = CommonResponse.class),
                                 examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4013,\n    \"message\": \"애플 서버로의 인증 토큰 요청에 실패하였습니다.\"\n  }\n}")
                         )
                 ),
@@ -141,7 +140,7 @@ public interface AuthApi {
                         description = "애플 private 키를 가져오는데 실패하였습니다.",
                         content = @Content(
                                 mediaType = "application/json",
-                                schema = @Schema(implementation = ErrorResponse.class),
+                                schema = @Schema(implementation = CommonResponse.class),
                                 examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4014,\n    \"message\": \"애플 private 키를 가져오는데 실패하였습니다.\"\n  }\n}")
                         )
                 )
@@ -164,25 +163,25 @@ public interface AuthApi {
                     @ApiResponse(responseCode = "400", description = "애플 액세스 토큰이 유효하지 않음",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    schema = @Schema(implementation = CommonResponse.class),
                                     examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4015,\n    \"message\": \"애플 Access Token 이 유효하지 않습니다.\"\n  }\n}")
                             )),
                     @ApiResponse(responseCode = "400", description = "애플 Authorization Code 가 만료되었습니다",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    schema = @Schema(implementation = CommonResponse.class),
                                     examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4019,\n    \"message\": \"Authorization Code 가 만료되었습니다.\"\n  }\n}")
                             )),
                     @ApiResponse(responseCode = "500", description = "애플 서버로의 인증 토큰 요청에 실패하였습니다.",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    schema = @Schema(implementation = CommonResponse.class),
                                     examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4013,\n    \"message\": \"애플 서버로의 인증 토큰 요청에 실패하였습니다.\"\n  }\n}")
                             )),
                     @ApiResponse(responseCode = "500", description = "애플 private 키를 가져오는데 실패하였습니다.",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    schema = @Schema(implementation = CommonResponse.class),
                                     examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4014,\n    \"message\": \"애플 private 키를 가져오는데 실패하였습니다.\"\n  }\n}")
                             ))
             }
