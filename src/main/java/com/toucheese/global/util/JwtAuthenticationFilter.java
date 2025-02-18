@@ -1,10 +1,8 @@
 package com.toucheese.global.util;
 
-import com.toucheese.global.data.JwtValidateStatus;
-import com.toucheese.global.exception.ErrorCode;
-import com.toucheese.global.exception.ToucheeseBadRequestException;
-import com.toucheese.global.exception.ToucheeseException;
-import com.toucheese.global.exception.ToucheeseInternalServerErrorException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.toucheese.global.data.CommonResponse;
+import com.toucheese.global.exception.*;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,41 +15,48 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenUtils tokenUtils;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String accessToken = tokenUtils.getTokenFromAuthorizationHeader(request);
-
-        if (StringUtils.hasText(accessToken)) {
-            JwtValidateStatus validateStatus = jwtTokenProvider.validateToken(accessToken);
-
-            switch (validateStatus) {
-                case DENIED:
-                    SecurityContextHolder.clearContext();
-                    // throw new ToucheeseUnAuthorizedException("올바르지 않은 토큰입니다.");
-                    throw new ToucheeseBadRequestException(ErrorCode.INVALID_ACCESS_TOKEN);
-                case EXPIRED:
-                    SecurityContextHolder.clearContext();
-                    // throw new ToucheeseUnAuthorizedException("토큰이 만료되었습니다.");
-                    throw new ToucheeseBadRequestException(ErrorCode.EXPIRED_ACCESS_TOKEN);
-                case ACCEPTED:
-                    Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                    break;
-                default:
-                    // throw new ToucheeseInternalServerErrorException("올바르지 않은 토큰 상태입니다.");
-                    throw new ToucheeseInternalServerErrorException(ErrorCode.INVALID_TOKEN_STATUS);
-            }
-        }
-
-        filterChain.doFilter(request, response);
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String[] excludePath = {
+                "/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**",
+                "/v3/api-docs/**", "/v1/admin/**", "/v1/studios/**", "/v1/products/**", "/v1/concepts/**", "/v1/reviews/**", "/v1/tokens/**",  "/v2/**", "/v1/images/**"
+        };
+        String path = request.getRequestURI();
+        return Arrays.stream(excludePath).anyMatch(path::startsWith);
     }
 
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String accessToken = tokenUtils.getTokenFromAuthorizationHeader(request);
+        try {
+            if (StringUtils.hasText(accessToken) && jwtTokenProvider.validateToken(accessToken, false)) {
+                    Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+            filterChain.doFilter(request, response);
+        } catch (GlobalCustomException e) {
+            sendErrorResponse(response, e.getErrorCode());
+        }
+    }
+
+    private void sendErrorResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
+        response.setStatus(errorCode.getHttpStatus().value());
+        response.setContentType("application/json;charset=UTF-8");
+
+        CommonResponse<Object> errorResponse = CommonResponse.fail(errorCode);
+
+        try (PrintWriter writer = response.getWriter()) {
+            writer.write(new ObjectMapper().writeValueAsString(errorResponse));
+            writer.flush();
+        }
+    }
 }

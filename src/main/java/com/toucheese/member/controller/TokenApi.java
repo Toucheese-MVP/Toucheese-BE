@@ -1,6 +1,6 @@
 package com.toucheese.member.controller;
 
-import com.toucheese.global.data.ErrorResponse;
+import com.toucheese.global.data.CommonResponse;
 import com.toucheese.global.data.SuccessResponse;
 import com.toucheese.member.dto.LoginResponse;
 import com.toucheese.member.dto.ReissueRequest;
@@ -34,7 +34,7 @@ public interface TokenApi {
                             responseCode = "400",
                             description = "Refresh 토큰 만료",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    schema = @Schema(implementation = CommonResponse.class),
                                     examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4001,\n    \"message\": \"Refresh 토큰이 만료되었습니다, 재로그인이 필요합니다.\"\n  }\n}")
                             )
                     ),
@@ -43,7 +43,7 @@ public interface TokenApi {
                             responseCode = "404",
                             description = "deviceId에 해당하는 토큰을 찾을 수 없음",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    schema = @Schema(implementation = CommonResponse.class),
                                     examples = @ExampleObject(value = "{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4004,\n    \"message\": \"deviceId에 해당하는 토큰을 찾을 수 없습니다.\"\n  }\n}")
                             )
                     )
@@ -69,7 +69,7 @@ public interface TokenApi {
                             responseCode = "401",
                             description = "로그아웃에 실패하였습니다.",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = ErrorResponse.class),
+                                    schema = @Schema(implementation = CommonResponse.class),
                                     examples = @ExampleObject("{\n  \"success\": false,\n  \"payload\": null,\n  \"error\": {\n    \"code\": 4017,\n    \"message\": \"로그아웃에 실패하였습니다.\"\n  }\n}")
                             )
                     )

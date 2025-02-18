@@ -2,9 +2,7 @@ package com.toucheese.reservation.service;
 
 import java.time.LocalDate;
 
-import com.toucheese.global.exception.ErrorCode;
 import com.toucheese.global.exception.ToucheeseBadRequestException;
-import com.toucheese.global.exception.ToucheeseJwtException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
