@@ -12,7 +12,7 @@ public class Token {
     private Long id;
 
     @JoinColumn(name = "member_id")
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     private String refreshToken;
