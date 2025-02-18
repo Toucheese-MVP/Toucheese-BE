@@ -33,9 +33,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 추가
-                .exceptionHandling(config -> config
-                        .authenticationEntryPoint(customAuthenticationEntryPoint)
-                )
+                .exceptionHandling(handler -> handler.authenticationEntryPoint(customAuthenticationEntryPoint))
                 .authorizeHttpRequests(requests ->
                         requests.requestMatchers(HttpMethod.GET, "/v1/concepts/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/v1/studios/**").permitAll()

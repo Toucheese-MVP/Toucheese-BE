@@ -6,17 +6,11 @@ import com.toucheese.member.dto.MemberTokenResponse;
 import com.toucheese.member.dto.LoginResponse;
 import com.toucheese.member.dto.ReissueRequest;
 import com.toucheese.member.service.TokenService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import com.toucheese.global.data.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
