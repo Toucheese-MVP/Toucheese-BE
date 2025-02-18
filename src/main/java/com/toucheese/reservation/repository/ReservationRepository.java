@@ -31,4 +31,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 	List<Reservation> findAllByStatus(ReservationStatus reservationStatus);
 
 	List<Reservation> findByMemberId(Long memberId);
+
+    void deleteByMemberId(Long memberId);
 }
