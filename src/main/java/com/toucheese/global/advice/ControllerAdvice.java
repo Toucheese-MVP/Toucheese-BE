@@ -4,7 +4,9 @@ package com.toucheese.global.advice;
 import com.toucheese.global.exception.ToucheeseException;
 import com.toucheese.global.exception.GlobalCustomException;
 import com.toucheese.global.data.CommonResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -34,8 +36,9 @@ public class ControllerAdvice {
     // GlobalCustomException 처리
     @ResponseBody
     @ExceptionHandler(GlobalCustomException.class)
-    public ResponseEntity<CommonResponse<?>> handleJwtException(GlobalCustomException e) {
+    public ResponseEntity<CommonResponse<?>> handleJwtException(GlobalCustomException e, HttpServletResponse response) {
         log.error(e.getMessage());
+        response.setHeader("X-Error-Code", String.valueOf(e.getErrorCode().getCode()));
         CommonResponse<?> commonResponse = CommonResponse.fail(e.getErrorCode());
         return new ResponseEntity<>(commonResponse, commonResponse.httpStatus());
     }
