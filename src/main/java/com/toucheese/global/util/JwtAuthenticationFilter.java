@@ -51,6 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void sendErrorResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
         response.setStatus(errorCode.getHttpStatus().value());
         response.setContentType("application/json;charset=UTF-8");
+        response.setHeader("X-Error-Code", String.valueOf(errorCode.getCode()));
 
         CommonResponse<Object> errorResponse = CommonResponse.fail(errorCode);
 
