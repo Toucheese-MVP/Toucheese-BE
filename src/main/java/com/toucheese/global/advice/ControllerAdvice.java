@@ -1,6 +1,6 @@
 package com.toucheese.global.advice;
 
-import com.toucheese.global.exception.ErrorCode;
+
 import com.toucheese.global.exception.ToucheeseException;
 import com.toucheese.global.exception.GlobalCustomException;
 import com.toucheese.global.data.CommonResponse;
