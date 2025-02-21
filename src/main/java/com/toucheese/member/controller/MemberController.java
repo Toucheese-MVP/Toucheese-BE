@@ -1,9 +1,7 @@
 package com.toucheese.member.controller;
 
-import java.io.IOException;
 import java.security.Principal;
 
-import com.toucheese.member.service.AppleAuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

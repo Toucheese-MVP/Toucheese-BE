@@ -67,7 +67,8 @@ public interface AuthApi {
     @Operation(
             summary = "애플 로그인 처리",
             description = """
-					애플 OAuth 인증 후 전달받은 id Token 으로 사용자 정보를 추출후 사용자 정보와 JWT 토큰 발급하여 반환합니다. \n
+					애플 OAuth 인증 후 전달받은 id Token, username 과 platform, deviceId 을 포함시켜 요청을 보냅니다. \n 
+					그 결과 로그인한 사용자의 정보와 JWT 토큰 발급하여 반환합니다. \n
 					JWT Access Token은 Response Header로 반환합니다.""",
             responses = {
                     @ApiResponse(
