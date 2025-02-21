@@ -14,6 +14,7 @@ import com.toucheese.member.service.MemberService;
 import com.toucheese.reservation.dto.ReservationRequest;
 import com.toucheese.reservation.dto.ReservationSuccessResponse;
 import com.toucheese.studio.service.StudioService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,9 @@ import com.toucheese.reservation.entity.ReservationStatus;
 import com.toucheese.reservation.repository.ReservationRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.StringUtils;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
@@ -108,12 +111,20 @@ public class ReservationService {
 
 		// 회원의 전화번호 유무 확인
 		Member member = memberOpt.get();
-		if (member.getPhone() == null || member.getPhone().isEmpty()) {
-			member.setPhone(reservationRequest.phone());
-			memberRepository.save(member);
-			throw new GlobalCustomException(ErrorCode.PHONE_NOT_FOUND);
-		}
+		if (!StringUtils.hasText(member.getPhone())) {  // 기존 전화번호가 없는 경우
+			log.info("{}님의 전화번호가 비어있습니다.", member.getName());
 
+			String requestPhone = reservationRequest.phone();
+
+			if (StringUtils.hasText(requestPhone)) {  // 요청한 전화번호가 존재할 경우에만 업데이트
+				log.info("{}님의 전화번호가 {}로 업데이트 되었습니다.", member.getName(), requestPhone);
+				member.setPhone(requestPhone);
+				memberRepository.save(member);
+			} else {
+				log.info("요청에 전화번호 필드가 null 이거나 값이 비어있습니다.");
+				throw new GlobalCustomException(ErrorCode.PHONE_REQUEST_NOT_FOUND);
+			}
+		}
 
 
 		// 새로운 예약 생성
