@@ -11,6 +11,8 @@ public record AppleLoginRequest(
         @NotBlank
         String platform,
         @Nullable
+        String username,
+        @Nullable
         String deviceId
 ) {
 }
