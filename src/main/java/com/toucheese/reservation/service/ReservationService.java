@@ -114,6 +114,8 @@ public class ReservationService {
 			throw new GlobalCustomException(ErrorCode.PHONE_NOT_FOUND);
 		}
 
+
+
 		// 새로운 예약 생성
 		Reservation reservation = Reservation.builder()
 				.product(productService.findProductById(reservationRequest.productId()))
@@ -173,7 +175,7 @@ public class ReservationService {
 //				})
 //				.findFirst();
 
-	//		System.out.println("저장할 전화번호: " + reservationRequest.phone());
+
 
 //		// 전화번호가 있는 예약을 찾기
 //		Optional<Reservation> reservationWithPhone = reservations.stream()
@@ -184,4 +186,6 @@ public class ReservationService {
 //		if (reservationWithPhone.isEmpty()) {
 //			throw new ToucheeseJwtException(ErrorCode.DONT_HAVE_PHONE_NUMBER);
 //		}
+
+	// System.out.println("저장할 전화번호: " + reservationRequest.phone());
 }
