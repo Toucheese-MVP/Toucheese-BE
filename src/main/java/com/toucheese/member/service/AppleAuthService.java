@@ -6,6 +6,7 @@ import com.toucheese.global.exception.GlobalCustomException;
 import com.toucheese.global.util.JwtTokenProvider;
 import com.toucheese.member.dto.*;
 import com.toucheese.member.client.AppleAuthClient;
+import com.toucheese.member.repository.MemberRepository;
 import com.toucheese.member.util.ApplePublicKeyGenerator;
 import com.toucheese.member.entity.Member;
 import io.jsonwebtoken.Claims;
@@ -63,10 +64,10 @@ public class AppleAuthService {
     /**
      * Apple 로그인 요청을 처리하는 메서드
      */
-    public SocalLoginCombinedResponse handleAppleLogin(AppleLoginRequest appleAuthRequest) throws AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException {
-        AppleMember appleMember = getAppleMemberInfo(appleAuthRequest.idToken());
+    public SocalLoginCombinedResponse handleAppleLogin(AppleLoginRequest appleLoginRequest) throws AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException {
+        AppleMember appleMember = getAppleMemberInfo(appleLoginRequest);
         Member member = memberService.findOrCreateMember(appleMember);
-        String deviceId = appleAuthRequest.deviceId();
+        String deviceId = appleLoginRequest.deviceId();
         TokenDTO tokenDTO = tokenService.loginMemberToken(member, deviceId);
 
         return new SocalLoginCombinedResponse(SocialLoginResponse.from(member, tokenDTO), tokenDTO.accessToken());
@@ -82,18 +83,19 @@ public class AppleAuthService {
     /**
      * Apple ID Token 을 기반으로 회원 정보를 추출하는 메서드
      */
-    public AppleMember getAppleMemberInfo(String identityToken) throws AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public AppleMember getAppleMemberInfo(AppleLoginRequest appleLoginRequest) throws AuthenticationException, NoSuchAlgorithmException, InvalidKeySpecException {
+        String identityToken = appleLoginRequest.idToken();
         Map<String, String> headers = jwtTokenProvider.parseHeaders(identityToken);
         PublicKey publicKey = applePublicKeyGenerator.generatePublicKey(headers, getAppleAuthPublicKey());
         Claims claims = jwtTokenProvider.getTokenClaims(identityToken, publicKey);
 
-        log.info("애플 로그인 사용자 이름 : {}", (String) claims.get("name.firstName") + claims.get("name.lastName"));
-        log.info("애플 로그인 사용자 이메일 : {}", (String) claims.get("email"));
-        return new AppleMember(
-                claims.getSubject(), // Apple userID
-                (String) claims.get("name.firstName") + claims.get("name.lastName"),
-                (String) claims.get("email")
-        );
+        String userId = claims.getSubject();
+        String username = appleLoginRequest.username();
+        String email = (String) claims.get("email");
+
+        log.info("[애플 사용자 정보] 이름 : {}, 이메일 : {}, ID : {}", username, email, userId);
+
+        return new AppleMember(userId, username, email);
     }
 
     /**
