@@ -2,9 +2,14 @@ package com.toucheese.member.service;
 
 import java.security.Principal;
 
+import com.toucheese.cart.repository.CartRepository;
 import com.toucheese.global.exception.ToucheeseBadRequestException;
 import com.toucheese.member.dto.AppleMember;
 import com.toucheese.member.dto.*;
+import com.toucheese.member.repository.TokenRepository;
+import com.toucheese.question.repository.QuestionRepository;
+import com.toucheese.reservation.repository.ReservationRepository;
+import com.toucheese.review.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +24,13 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
-
 	private final MemberRepository memberRepository;
 	private final TokenService tokenService;
+	private final CartRepository cartRepository;
+	private final QuestionRepository questionRepository;
+	private final ReservationRepository reservationRepository;
+	private final ReviewRepository reviewRepository;
+	private final TokenRepository tokenRepository;
 
 	/**
 	 * 회원 정보 검색
@@ -120,9 +129,6 @@ public class MemberService {
 		return memberRepository.save(member);
 	}
 
-
-
-
 	@Transactional
 	public void memberFirstLoginUpdate(MemberFirstLoginUpdateRequest request, Principal principal) {
 		Long MemberId = PrincipalUtils.extractMemberId(principal);
@@ -150,6 +156,19 @@ public class MemberService {
 		Member member = findMemberById(memberId);
 		memberRepository.delete(member);
 	}
+
+	/**
+	 * 소셜 로그인 전용 임시 회원 탈퇴 (회원 관련 데이터 삭제 API)
+	 */
+	@Transactional
+	public void deleteMemberRelatedData(Long memberId) {
+		cartRepository.deleteByMemberId(memberId);
+		questionRepository.deleteByMemberId(memberId);
+		reservationRepository.deleteByMemberId(memberId);
+		reviewRepository.deleteByMemberId(memberId);
+		tokenRepository.deleteByMemberId(memberId);
+	}
+
 
 
 	@Transactional(readOnly = true)

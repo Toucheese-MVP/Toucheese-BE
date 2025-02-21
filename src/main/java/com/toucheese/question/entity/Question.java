@@ -60,7 +60,7 @@ public class Question {
     @JoinColumn(name = "answer_id")
     private Answer answer;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "question")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuestionImage> questionImages;
 
     public void update(String title, String content) {

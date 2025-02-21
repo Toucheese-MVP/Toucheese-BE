@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.toucheese.global.exception.ErrorCode;
 import com.toucheese.global.exception.ToucheeseBadRequestException;
-import com.toucheese.global.exception.ToucheeseJwtException;
+import com.toucheese.global.exception.GlobalCustomException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -151,11 +151,11 @@ public class KakaoAuthService {
 				log.info("카카오 서버 unlink 요청 성공");
 				return true;
 			} else {
-				throw new ToucheeseJwtException(ErrorCode.KAKAO_WITHDRAW_FAIL);
+				throw new GlobalCustomException(ErrorCode.KAKAO_WITHDRAW_FAIL);
 			}
 		} catch (Exception e) {
 			log.error("카카오 서버 unlink 요청 실패 : ", e);
-			throw new ToucheeseJwtException(ErrorCode.KAKAO_WITHDRAW_FAIL);
+			throw new GlobalCustomException(ErrorCode.KAKAO_WITHDRAW_FAIL);
 		}
 	}
 }

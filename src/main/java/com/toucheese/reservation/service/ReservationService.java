@@ -7,13 +7,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.toucheese.global.exception.ErrorCode;
-import com.toucheese.global.exception.ToucheeseJwtException;
+import com.toucheese.global.exception.GlobalCustomException;
 import com.toucheese.member.entity.Member;
 import com.toucheese.member.repository.MemberRepository;
 import com.toucheese.member.service.MemberService;
 import com.toucheese.reservation.dto.ReservationRequest;
 import com.toucheese.reservation.dto.ReservationSuccessResponse;
-import com.toucheese.studio.repository.StudioRepository;
 import com.toucheese.studio.service.StudioService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,14 +102,16 @@ public class ReservationService {
 
 		// 회원이 존재하지 않을 경우 예외 처리
 		if (memberOpt.isEmpty()) {
-			throw new ToucheeseJwtException(ErrorCode.MEMBER_NOT_FOUND);
+			throw new GlobalCustomException(ErrorCode.MEMBER_NOT_FOUND);
 
 		}
 
 		// 회원의 전화번호 유무 확인
 		Member member = memberOpt.get();
 		if (member.getPhone() == null || member.getPhone().isEmpty()) {
-			throw new ToucheeseJwtException(ErrorCode.PHONE_NOT_FOUND);
+			member.setPhone(reservationRequest.phone());
+			memberRepository.save(member);
+			throw new GlobalCustomException(ErrorCode.PHONE_NOT_FOUND);
 		}
 
 
