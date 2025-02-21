@@ -87,6 +87,8 @@ public class AppleAuthService {
         PublicKey publicKey = applePublicKeyGenerator.generatePublicKey(headers, getAppleAuthPublicKey());
         Claims claims = jwtTokenProvider.getTokenClaims(identityToken, publicKey);
 
+        log.info("애플 로그인 사용자 이름 : {}", (String) claims.get("name.firstName") + claims.get("name.lastName"));
+        log.info("애플 로그인 사용자 이메일 : {}", (String) claims.get("email"));
         return new AppleMember(
                 claims.getSubject(), // Apple userID
                 (String) claims.get("name.firstName") + claims.get("name.lastName"),
