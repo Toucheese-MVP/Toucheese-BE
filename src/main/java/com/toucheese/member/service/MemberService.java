@@ -1,6 +1,7 @@
 package com.toucheese.member.service;
 
 import java.security.Principal;
+import java.util.Optional;
 
 import com.toucheese.cart.repository.CartRepository;
 import com.toucheese.global.exception.ToucheeseBadRequestException;
@@ -10,6 +11,7 @@ import com.toucheese.member.repository.TokenRepository;
 import com.toucheese.question.repository.QuestionRepository;
 import com.toucheese.reservation.repository.ReservationRepository;
 import com.toucheese.review.repository.ReviewRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ import com.toucheese.member.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -112,9 +115,17 @@ public class MemberService {
 	 * @return 회원 엔티티
 	 */
 	public Member findOrCreateMember(AppleMember appleMember) {
-		return memberRepository.findBySocialId(appleMember.id())
-				.orElseGet(() -> createMember(appleMember));
-	}
+		Optional<Member> optMember = memberRepository.findBySocialId(appleMember.id());
+        Member member;
+        if (optMember.isPresent()) {
+            member = optMember.get();
+			log.info("{} 사용자 {} 님은 전에 로그인 한 적이 있습니다.", member.getAuthProvider(), member.getName());
+        } else {
+            member = createMember(appleMember);
+			log.info("{} 사용자 {} 님은 최초 로그인 입니다.", member.getAuthProvider(), member.getName());
+        }
+        return member;
+    }
 
 	private Member createMember(AppleMember appleMember) {
 		Member member = Member.builder()
