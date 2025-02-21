@@ -109,6 +109,8 @@ public class ReservationService {
 		// 회원의 전화번호 유무 확인
 		Member member = memberOpt.get();
 		if (member.getPhone() == null || member.getPhone().isEmpty()) {
+			member.setPhone(reservationRequest.phone());
+			memberRepository.save(member);
 			throw new GlobalCustomException(ErrorCode.PHONE_NOT_FOUND);
 		}
 
