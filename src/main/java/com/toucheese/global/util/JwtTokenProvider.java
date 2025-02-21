@@ -13,8 +13,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toucheese.global.exception.ErrorCode;
-import com.toucheese.global.exception.ToucheeseJwtException;
+import com.toucheese.global.exception.GlobalCustomException;
 import com.toucheese.member.entity.Role;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,10 +26,6 @@ import org.springframework.stereotype.Component;
 import com.toucheese.global.config.AppConfig;
 import com.toucheese.global.data.JwtValidateStatus;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 
@@ -95,25 +93,37 @@ public class JwtTokenProvider {
 
     /**
      * 토큰 검증을 위한 메서드
-     * @param token 접근 토큰 혹은 갱신 토큰
-     * @return JwtValidateStatus
-     *  ACCEPTED 검증 완료
-     *  EXPIRED 만료
-     *  DENIED 검증 실패
+     * @param token 토큰
+     * @param isRefreshToken false : 액세스 토큰, true : 리프레시 토큰
+     * @return 토큰이 유효하면 true, 아니면 false
      */
-    public JwtValidateStatus validateToken(String token) {
+    public boolean validateToken(String token, boolean isRefreshToken) {
         try {
             Jwts.parser()
                     .verifyWith(secretKey)
                     .build()
                     .parseSignedClaims(token);
-            return JwtValidateStatus.ACCEPTED;
-        } catch (ExpiredJwtException e){
-            return JwtValidateStatus.EXPIRED;
-        } catch (JwtException e) {
-            return JwtValidateStatus.DENIED;
+            return true;
+        } catch (ExpiredJwtException e) {
+            log.error("만료된 JWT 토큰 입니다: {}", e.getMessage());
+            throw new GlobalCustomException(
+                    isRefreshToken ? ErrorCode.EXPIRED_REFRESH_TOKEN : ErrorCode.EXPIRED_ACCESS_TOKEN
+            );
+
+        } catch (MalformedJwtException e) {
+            log.error("잘못된 형식의 JWT 토큰입니다: {}", e.getMessage());
+            throw new GlobalCustomException(
+                    isRefreshToken ? ErrorCode.MALFORMED_REFRESH_TOKEN : ErrorCode.MALFORMED_ACCESS_TOKEN
+            );
+        } catch (SignatureException e) {
+            log.error("JWT 서명이 유효하지 않습니다: {}", e.getMessage());
+            throw new GlobalCustomException(
+                    isRefreshToken ? ErrorCode.INVALID_REFRESH_TOKEN : ErrorCode.INVALID_ACCESS_TOKEN
+            );
         }
     }
+
+
 
     /**
      * 인증 정보 설정을 위한 메서드
@@ -131,14 +141,14 @@ public class JwtTokenProvider {
     public Map<String, String> parseHeaders(String token) {
         String[] parts = token.split("\\.");
         if (parts.length != 3) {
-            throw new ToucheeseJwtException(ErrorCode.INVALID_ID_TOKEN);
+            throw new GlobalCustomException(ErrorCode.INVALID_ID_TOKEN);
         }
         String header = decodeHeader(parts[0]);
         try {
             return objectMapper.readValue(header, new TypeReference<Map<String, String>>() {
             });
         } catch (JsonProcessingException e) {
-            throw new ToucheeseJwtException(ErrorCode.INVALID_HEADER_PARSING);
+            throw new GlobalCustomException(ErrorCode.INVALID_HEADER_PARSING);
         }
     }
 

@@ -21,6 +21,7 @@ import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Entity @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -52,6 +53,7 @@ public class Studio {
     @Column(columnDefinition = "TEXT")
     private String notice;
 
+    @BatchSize(size = 10)
     @OneToMany(mappedBy = "studio", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<StudioImage> studioImages;
 

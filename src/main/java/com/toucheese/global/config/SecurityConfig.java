@@ -33,9 +33,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 추가
-                .exceptionHandling(config -> config
-                        .authenticationEntryPoint(customAuthenticationEntryPoint)
-                )
+                .exceptionHandling(handler -> handler.authenticationEntryPoint(customAuthenticationEntryPoint))
                 .authorizeHttpRequests(requests ->
                         requests.requestMatchers(HttpMethod.GET, "/v1/concepts/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/v1/studios/**").permitAll()
@@ -47,9 +45,12 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/v1/members/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/v1/messages/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/v1/tokens/reissue").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/v1/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/v1/auth/**").permitAll()
+
                                 // .requestMatchers(HttpMethod.POST, "/v1/images/**").permitAll()
+
+                                .requestMatchers(HttpMethod.GET, "/v1/auth/**").permitAll()
+
                                 .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**",
                                         "/v3/api-docs/**").permitAll()
                                 .requestMatchers("/v1/admin/**").hasAuthority("ADMIN")

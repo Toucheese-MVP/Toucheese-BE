@@ -2,13 +2,12 @@ package com.toucheese.member.service;
 
 
 import com.toucheese.global.exception.ErrorCode;
-import com.toucheese.global.exception.ToucheeseJwtException;
+import com.toucheese.global.exception.GlobalCustomException;
 import com.toucheese.global.util.JwtTokenProvider;
 import com.toucheese.member.dto.*;
 import com.toucheese.member.client.AppleAuthClient;
 import com.toucheese.member.util.ApplePublicKeyGenerator;
 import com.toucheese.member.entity.Member;
-import feign.FeignException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +17,10 @@ import org.bouncycastle.util.io.pem.PemReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import reactor.core.publisher.Mono;
 
 import javax.naming.AuthenticationException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -148,7 +145,7 @@ public class AppleAuthService {
             appleAuthClient.revokeAppleAuthToken(revokeRequest);
             return true;
         } else {
-            throw new ToucheeseJwtException(ErrorCode.INVALID_ACCESS_TOKEN);
+            throw new GlobalCustomException(ErrorCode.INVALID_ACCESS_TOKEN);
         }
     }
 
@@ -179,7 +176,7 @@ public class AppleAuthService {
         File file = new File(privateKeyPath);
         if (!file.exists() || !file.canRead()) {
             log.error("Private key 파일을 읽을 수 없습니다. 경로: {}", privateKeyPath);
-            throw new ToucheeseJwtException(ErrorCode.FAIL_TO_LOAD_PRIVATE_KEY);
+            throw new GlobalCustomException(ErrorCode.FAIL_TO_LOAD_PRIVATE_KEY);
         }
 
         byte[] keyBytes = readPrivateKeyFile(file);
@@ -195,7 +192,7 @@ public class AppleAuthService {
             return pemObject.getContent();
         } catch (IOException e) {
             log.error("Apple Private Key 파일을 읽는 중 오류 발생: {}", privateKeyPath, e);
-            throw new ToucheeseJwtException(ErrorCode.FAIL_TO_LOAD_PRIVATE_KEY);
+            throw new GlobalCustomException(ErrorCode.FAIL_TO_LOAD_PRIVATE_KEY);
         }
     }
 
@@ -206,7 +203,7 @@ public class AppleAuthService {
             return keyFactory.generatePrivate(keySpec);
         } catch (Exception e) {
             log.error("Apple Private Key 파일을 파싱하는데 문제가 발생했습니다.", e);
-            throw new ToucheeseJwtException(ErrorCode.FAIL_TO_LOAD_PRIVATE_KEY);
+            throw new GlobalCustomException(ErrorCode.FAIL_TO_LOAD_PRIVATE_KEY);
         }
     }
 }
