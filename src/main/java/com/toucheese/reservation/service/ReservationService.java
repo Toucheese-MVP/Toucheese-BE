@@ -13,8 +13,10 @@ import com.toucheese.member.repository.MemberRepository;
 import com.toucheese.member.service.MemberService;
 import com.toucheese.reservation.dto.ReservationRequest;
 import com.toucheese.reservation.dto.ReservationSuccessResponse;
+import com.toucheese.solapi.util.SolapiUtil;
 import com.toucheese.studio.service.StudioService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,8 +42,8 @@ public class ReservationService {
 	private final ReservationReadService reservationReadService;
 	private final StudioService studioService;
 	private final ProductService productService;
-	private final MemberService memberService;
 	private final MemberRepository memberRepository;
+	private final SolapiUtil solapiUtil;
 
 	@Transactional
 	public void createReservationsFromCarts(List<Cart> carts) {
@@ -143,6 +145,10 @@ public class ReservationService {
 				.build();
 
 		reservationRepository.save(reservation);
+
+		String messageText = solapiUtil.formatMessage(member.getName());
+		String registeredSenderNumber = "01098455844";
+		solapiUtil.send(registeredSenderNumber, member.getPhone(), messageText);
 
 		return ReservationSuccessResponse.builder()
 				.status(true)
