@@ -4,6 +4,7 @@ import java.security.Principal;
 
 import com.toucheese.reservation.dto.ReservationRequest;
 import com.toucheese.reservation.dto.ReservationSuccessResponse;
+import com.toucheese.solapi.util.SolapiUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,6 +39,7 @@ public class ReservationController {
 	private final CartService cartService;
 	private final ReservationService reservationService;
 	private final ReservationReadService reservationReadService;
+	private final SolapiUtil solapiUtil;
 
 	@Operation(
 		summary = "예약 기능",
@@ -107,6 +109,7 @@ public class ReservationController {
 		Long memberId = PrincipalUtils.extractMemberId(principal);
 
 		ReservationSuccessResponse response = reservationService.createInstantReservation(memberId, reservationRequest);
+
 		return ResponseEntity.ok(response);
 	}
 
