@@ -24,6 +24,10 @@ public class SolapiUtil {
         return String.format(MESSAGE_TEMPLATE, name);
     }
 
+    public String determineFormatMessage(String name) {
+        return String.format("안녕하세요, %s 님! 예약이 확정되었습니다.", name);
+    }
+
     public void send(String from, String to, String messageText) {
         Message message = new Message();
         message.setFrom(from);
