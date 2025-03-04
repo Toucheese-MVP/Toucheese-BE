@@ -52,14 +52,23 @@ public class AdminReservationService {
 			throw new GlobalCustomException(ErrorCode.RESERVATION_NOT_FOUND);
 		}
 
-		// 예약 상태를 "예약 확정"으로 변경
+		// 상태가 null인지 확인
+		if (newStatus == null) {
+			log.error("새로운 상태가 null입니다.");
+			throw new GlobalCustomException(ErrorCode.RESERVATION_STATUS_NOT_FOUND);
+		}
+
+		// 예약 상태가 "예약 확정"일 경우 문자 메시지 전송
 		if(newStatus == ReservationStatus.예약확정){
 			String messageText = solapiUtil.determineFormatMessage(reservation.getMember().getName());
 			String registeredSenderNumber = "01098455844";
 			solapiUtil.send(registeredSenderNumber, reservation.getMember().getPhone(), messageText);
 		}
 
-		reservation.updateStatus(newStatus); // 예약 상태 업데이트
-		reservationRepository.save(reservation); // 변경 사항 저장
+		// 예약 상태 업데이트
+		reservation.updateStatus(newStatus);
+
+		// 변경 사항 저장
+		reservationRepository.save(reservation);
 	}
 }
