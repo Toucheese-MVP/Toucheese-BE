@@ -19,6 +19,7 @@ public enum ErrorCode {
 
     /* 예약 관련 */
     RESERVATION_NOT_FOUND(4010, HttpStatus.NOT_FOUND, "예약된 정보가 없습니다."),
+    RESERVATION_STATUS_NOT_FOUND(4020, HttpStatus.NOT_FOUND, "예약된 정보의 상태를 찾을 수 없습니다."),
 
     /* 회원 관련 */
     PHONE_REQUEST_NOT_FOUND(4011, HttpStatus.NOT_FOUND, "요청에 전화번호 필드가 누락되었습니다."),
