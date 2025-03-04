@@ -2,6 +2,7 @@ package com.toucheese.admin.controller;
 
 import java.time.LocalDate;
 
+import com.toucheese.solapi.util.SolapiUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,12 +43,14 @@ public class AdminReservationController {
 		return SuccessResponse.getObjectSuccess(adminReservationService.findReservations(status, createDate, page));
 	}
 
+
 	@Operation(summary = "관리자 예약 상태 수정")
 	@PutMapping("/{reservationId}/status")
 	public ResponseEntity<?> updateReservationStatus(
-		@PathVariable Long reservationId,
-		@RequestBody UpdateReservationStatusRequest request
+			@PathVariable Long reservationId,
+			@RequestBody UpdateReservationStatusRequest request
 	) {
+		// 요청에서 전달된 상태를 사용하여 예약 상태 업데이트
 		adminReservationService.updateReservationStatus(reservationId, request.status());
 		return SuccessResponse.updatedSuccess("예약 상태를 성공적으로 업데이트했습니다.");
 	}
