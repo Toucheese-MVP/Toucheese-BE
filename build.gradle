@@ -92,6 +92,10 @@ dependencies {
 	// openfeign
 	implementation platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+	// Firebase
+	implementation 'com.google.firebase:firebase-admin:9.4.3'
+	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
 }
 
 
