@@ -17,7 +17,13 @@ public class FeignErrorDecoder implements ErrorDecoder {
 
         log.error("FeignClient Error: methodKey = {}, status = {}, body = {}", methodKey, response.status(), responseBody);
 
+
         return switch (response.status()) {
+            case 408 -> {
+                log.error("Request Timeout: methodKey = {}, status = {}, body = {}", methodKey, response.status(), responseBody);
+                yield new GlobalCustomException(ErrorCode.REQUEST_TIMEOUT);
+            }
+
             case 400 -> {
                 if (methodKey.contains("getAppleToken")) {
                     // 애플 서버로부터 AccessToken 관련 오류 처리

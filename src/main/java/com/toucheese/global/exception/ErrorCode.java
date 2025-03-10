@@ -17,6 +17,7 @@ public enum ErrorCode {
     INVALID_ACCESS_TOKEN(4006, HttpStatus.UNAUTHORIZED, "유효하지 않은 액세스 토큰입니다."),
     MALFORMED_ACCESS_TOKEN(4007, HttpStatus.UNAUTHORIZED, "잘못된 형식의 액세스 토큰입니다."),
 
+
     /* 예약 관련 */
     RESERVATION_NOT_FOUND(4010, HttpStatus.NOT_FOUND, "예약된 정보가 없습니다."),
     RESERVATION_STATUS_NOT_FOUND(4020, HttpStatus.NOT_FOUND, "예약된 정보의 상태를 찾을 수 없습니다."),
@@ -34,14 +35,15 @@ public enum ErrorCode {
     APPLE_REVOKE_TOKEN_FAIL(4016, HttpStatus.BAD_REQUEST, "애플 Access Token 무효화에 실패하였습니다."),
     LOGOUT_UNAUTHORIZED_ACCESS(4017, HttpStatus.UNAUTHORIZED, "로그아웃에 실패하였습니다."),
     KAKAO_WITHDRAW_FAIL(4018, HttpStatus.INTERNAL_SERVER_ERROR, "카카오 회원 탈퇴에 실패했습니다."),
+    REQUEST_TIMEOUT(4020, HttpStatus.REQUEST_TIMEOUT, "요청 시간 Timeout" ),
 
     
     // NOT_SAME_PASSWORD(4020, HttpStatus.BAD_REQUEST, "아이디 및 비밀번호가 일치하지 않습니다.")
 
-    AUTHORIZATION_CODE_EXPIRED(4019, HttpStatus.BAD_REQUEST, "Authorization Code가 만료되었습니다."),
+    AUTHORIZATION_CODE_EXPIRED(4019, HttpStatus.BAD_REQUEST, "Authorization Code가 만료되었습니다.");
 
 
-    ;
+
 
     private final int code;
     private final HttpStatus httpStatus;
