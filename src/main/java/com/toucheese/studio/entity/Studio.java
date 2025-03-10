@@ -71,6 +71,7 @@ public class Studio {
     @OneToMany(mappedBy = "studio", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Review> reviews;
 
+    // 즐겨찾기와 연관관계로 매핑
     @OneToMany(mappedBy = "studio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorites> favorites = new ArrayList<>();
 }
