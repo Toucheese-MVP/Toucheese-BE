@@ -1,8 +1,10 @@
 package com.toucheese.studio.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.toucheese.conceptstudio.entity.ConceptStudio;
+import com.toucheese.favorites.entity.Favorites;
 import com.toucheese.image.entity.FacilityImage;
 import com.toucheese.image.entity.StudioImage;
 import com.toucheese.product.entity.Product;
@@ -68,4 +70,8 @@ public class Studio {
 
     @OneToMany(mappedBy = "studio", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Review> reviews;
+
+    // 즐겨찾기와 연관관계로 매핑
+    @OneToMany(mappedBy = "studio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Favorites> favorites = new ArrayList<>();
 }
