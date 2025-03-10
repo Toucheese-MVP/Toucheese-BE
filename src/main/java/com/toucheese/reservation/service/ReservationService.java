@@ -7,11 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
 import com.toucheese.global.exception.ErrorCode;
 import com.toucheese.global.exception.GlobalCustomException;
-import com.toucheese.global.fcm.FcmService;
-import com.toucheese.global.fcm.PushMsg;
 import com.toucheese.member.entity.Member;
 import com.toucheese.member.repository.MemberRepository;
 import com.toucheese.member.service.MemberService;
@@ -19,7 +16,6 @@ import com.toucheese.reservation.dto.ReservationRequest;
 import com.toucheese.reservation.dto.ReservationSuccessResponse;
 import com.toucheese.solapi.util.SolapiUtil;
 import com.toucheese.studio.service.StudioService;
-import jakarta.annotation.PostConstruct;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +46,7 @@ public class ReservationService {
 	private final ProductService productService;
 	private final MemberRepository memberRepository;
 	private final SolapiUtil solapiUtil;
-	private final FcmService fcmService;
+	// private final FcmService fcmService;
 
 	@Transactional
 	public void createReservationsFromCarts(List<Cart> carts) {
