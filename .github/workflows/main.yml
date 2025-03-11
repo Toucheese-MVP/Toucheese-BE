@@ -27,6 +27,12 @@ jobs:
         run: |
           echo "${{ secrets.APPLICATION_SECRET }}" | base64 -d > ./src/main/resources/application-secret.yml
 
+      # Apple Private Key 파일 생성 (Base64 디코딩)
+      - name: Decode Apple Private Key
+        run: |
+          mkdir -p ./src/main/resources/static/apple 
+          echo "${{ secrets.APPLE_PRIVATE_KEY }}" | base64 -d > ./src/main/resources/static/apple/apple_private_key.p8      
+
       # Docker Build 진행 후 Docker hub 로 Push
       - name: Build and Push the Docker image
         env:
@@ -34,7 +40,8 @@ jobs:
         run: |
           docker buildx create --use
           docker buildx build --platform linux/amd64 \
-            --build-arg APPLICATION_SECRET_FILE=application-secret \
+            --build-arg APPLICATION_SECRET_FILE=src/main/resources/application-secret.yml \
+            --build-arg APPLE_PRIVATE_KEY_PATH=src/main/resources/static/apple/apple_private_key.p8 \  
             --tag "toucheeseteam2/toucheese-ios:$TAG" --push .
 
       # latest 태그로 덧붙여서 푸시하기
