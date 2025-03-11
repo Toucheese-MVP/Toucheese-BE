@@ -40,7 +40,7 @@ jobs:
           docker buildx create --use
           docker buildx build --platform linux/amd64 \
             --build-arg APPLICATION_SECRET_FILE=application-secret \
-            --build-arg APPLE_PRIVATE_KEY_FILE=apple_private_key \    
+            --build-arg APPLE_PRIVATE_KEY_FILE=apple_private_key \
             --tag "toucheeseteam2/toucheese-ios:$TAG" --push .
 
       # latest 태그로 덧붙여서 푸시하기
