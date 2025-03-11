@@ -40,7 +40,7 @@ jobs:
           docker buildx build --platform linux/amd64 \
             --build-arg APPLICATION_SECRET_FILE=src/main/resources/application-secret.yml \
             --build-arg APPLE_PRIVATE_KEY_PATH=${{ env.APPLE_PRIVATE_KEY_PATH }} \    
-            --tag "toucheeseteam2/toucheese-ios:$TAG" --push .
+            --tag "toucheeseteam2/toucheese-ios:$TAG" --push ./Toucheese-BE
 
       # latest 태그로 덧붙여서 푸시하기
       - name: Tag Image as latest
