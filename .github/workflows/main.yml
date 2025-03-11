@@ -27,6 +27,11 @@ jobs:
         run: |
           echo "${{ secrets.APPLICATION_SECRET }}" | base64 -d > ./src/main/resources/application-secret.yml
 
+      # Apple Private Key 파일 생성 (Base64 디코딩)
+      - name: Decode Apple Private Key
+        run: |
+          echo "${{ secrets.APPLE_PRIVATE_KEY }}" | base64 -d > ./src/main/resources/apple_private_key.pem
+
       # Docker Build 진행 후 Docker hub 로 Push
       - name: Build and Push the Docker image
         env:
