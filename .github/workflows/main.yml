@@ -30,6 +30,7 @@ jobs:
       # Apple Private Key 파일 생성 (Base64 디코딩)
       - name: Decode Apple Private Key
         run: |
+          mkdir -p ./src/main/resources/key
           echo "${{ secrets.APPLE_PRIVATE_KEY }}" | base64 -d > ./src/main/resources/key/apple_private_key.pem
 
       # Docker Build 진행 후 Docker hub 로 Push
