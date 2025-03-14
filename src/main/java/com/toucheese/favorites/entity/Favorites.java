@@ -3,10 +3,16 @@ package com.toucheese.favorites.entity;
 import com.toucheese.member.entity.Member;
 import com.toucheese.studio.entity.Studio;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@Table(name = "Favorites")
 public class Favorites {
     /*
         @Id
