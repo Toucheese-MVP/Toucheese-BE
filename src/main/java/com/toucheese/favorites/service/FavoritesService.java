@@ -25,9 +25,20 @@ public class FavoritesService {
 
     // 즐겨찾기 목록 조회용 메서드
     public List<FavoritesStudioListDto> getFavoriteStudios(Long memberId) {
-        return favoritesRepository.findByMemberId(memberId).stream()
-                .map(favorites -> new FavoritesStudioListDto(favorites.getStudio()))
+        List<Favorites> favorites = favoritesRepository.findByMemberId(memberId);
+        return convertToDtoList(favorites);
+    }
+
+    // 즐겨찾기 목록 조회용 메서드 - 리팩토링1
+    private List<FavoritesStudioListDto> convertToDtoList(List<Favorites> favorites){
+        return favorites.stream()
+                .map(this::convertToDto)
                 .toList();
+    }
+
+    // 즐겨찾기 목록 조회용 메서드 - 리팩토링2
+    private FavoritesStudioListDto convertToDto(Favorites favorites){
+        return new FavoritesStudioListDto(favorites.getStudio();
     }
 
     // 스튜디오 즐겨찾기 추가용 메서드
@@ -71,11 +82,19 @@ public class FavoritesService {
     // 스튜디오의 즐겨찾기 취소용
     @Transactional
     public void deleteFavorites(Long memberId, Long studioId){
+        validateFavoritesExistence(memberId, studioId);
+        deleteFavorite(memberId, studioId);
+    }
+
+    // 스튜디오의 즐겨찾기 취소용 - 리팩토링1
+    private void validateFavoritesExistence(Long memberId, Long studioId){
         if(!favoritesRepository.existsByMemberIdAndStudioId(memberId, studioId)){
             throw new IllegalStateException("즐겨찾기한 기록이 없습니다.");
         }
+    }
 
+    // 스튜디오의 즐겨찾기 취소용 - 리팩토링2
+    private void deleteFavorite(Long memberId, Long studioId){
         favoritesRepository.deleteByMemberIdAndStudioId(memberId, studioId);
-
     }
 }
