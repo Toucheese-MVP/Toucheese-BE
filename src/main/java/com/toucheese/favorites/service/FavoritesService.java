@@ -8,6 +8,7 @@ import com.toucheese.member.repository.MemberRepository;
 import com.toucheese.studio.entity.Studio;
 import com.toucheese.studio.repository.StudioRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,7 @@ public class FavoritesService {
     }
 
     // 스튜디오의 즐겨찾기 취소용
+    @Transactional
     public void deleteFavorites(Long memberId, Long studioId){
         if(!favoritesRepository.existsByMemberIdAndStudioId(memberId, studioId)){
             throw new IllegalStateException("즐겨찾기한 기록이 없습니다.");
