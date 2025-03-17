@@ -32,22 +32,40 @@ public class FavoritesService {
 
     // 스튜디오 즐겨찾기 추가용 메서드
     public void addFavorites(Long memberId, Long studioId) {
+        validateFavorites(memberId, studioId);
+
+        Member member = findMemberById(memberId);
+        Studio studio = findStudioById(studioId);
+
+        Favorites favorites = createFavorites(member, studio);
+        favoritesRepository.save(favorites);
+    }
+
+    // 스튜디오 즐겨찾기 추가용 메서드 - 리팩토링1
+    private void validateFavorites(Long memberId, Long studioId){
         if(favoritesRepository.existsByMemberIdAndStudioId(memberId, studioId)){
             throw new IllegalStateException("이미 즐겨찾기한 스튜디오입니다.");
         }
+    }
 
-        Member member = memberRepository.findById(memberId)
+    // 스튜디오 즐겨찾기 추가용 메서드 - 리팩토링2
+    private Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다."));
+    }
 
-        Studio studio = studioRepository.findById(studioId)
+    // 스튜디오 즐겨찾기 추가용 메서드 - 리팩토링3
+    private Studio findStudioById(Long studioId) {
+        return studioRepository.findById(studioId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 스튜디오를 찾을 수 없습니다."));
+    }
 
-        Favorites favorites = Favorites.builder()
+    // 스튜디오 즐겨찾기 추가용 메서드 - 리팩토링4
+    private Favorites createFavorites(Member member, Studio studio){
+        return Favorites.builder()
                 .member(member)
                 .studio(studio)
                 .build();
-
-        favoritesRepository.save(favorites);
     }
 
     // 스튜디오의 즐겨찾기 취소용
