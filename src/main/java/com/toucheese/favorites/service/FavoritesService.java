@@ -38,7 +38,7 @@ public class FavoritesService {
 
     // 즐겨찾기 목록 조회용 메서드 - 리팩토링2
     private FavoritesStudioListDto convertToDto(Favorites favorites){
-        return new FavoritesStudioListDto(favorites.getStudio();
+        return new FavoritesStudioListDto(favorites.getStudio());
     }
 
     // 스튜디오 즐겨찾기 추가용 메서드
