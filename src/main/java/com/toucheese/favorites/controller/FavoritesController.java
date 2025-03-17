@@ -30,8 +30,9 @@ public class FavoritesController {
     )
     @GetMapping("/inquiry")
     public Response<List<FavoritesStudioListDto>> getFavoriteStudios(
-            @RequestParam Long memberId
+            Principal principal
     ) {
+        Long memberId = PrincipalUtils.extractMemberId(principal);
         List<FavoritesStudioListDto> favoriteStudios = favoritesService.getFavoriteStudios(memberId);
         return Response.of(SuccessCode.GET_FAVORITES_STUDIOS_SUCCESS, favoriteStudios);
     }
@@ -62,9 +63,10 @@ public class FavoritesController {
     )
     @DeleteMapping("/{studioId}/deleteFavorites")
     public Response<Void> deleteFavoriteStudio(
-            @RequestParam Long memberId,
+            Principal principal,
             @PathVariable Long studioId
     ){
+        Long memberId = PrincipalUtils.extractMemberId(principal);
         favoritesService.deleteFavorites(memberId, studioId);
         return Response.of(SuccessCode.REMOVE_FAVORITES_SUCCESS);
     }
