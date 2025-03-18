@@ -36,6 +36,8 @@ public enum ErrorCode {
     LOGOUT_UNAUTHORIZED_ACCESS(4017, HttpStatus.UNAUTHORIZED, "로그아웃에 실패하였습니다."),
     KAKAO_WITHDRAW_FAIL(4018, HttpStatus.INTERNAL_SERVER_ERROR, "카카오 회원 탈퇴에 실패했습니다."),
     REQUEST_TIMEOUT(4020, HttpStatus.REQUEST_TIMEOUT, "요청 시간 Timeout" ),
+    FCM_NOT_FOUND(4021, HttpStatus.BAD_REQUEST, "회원님의 FCM 토큰을 찾을 수 없습니다." ),
+
 
     
     // NOT_SAME_PASSWORD(4020, HttpStatus.BAD_REQUEST, "아이디 및 비밀번호가 일치하지 않습니다.")
