@@ -47,3 +47,4 @@ out/
 
 # application setting
 /src/main/resources/application-secret.yml
+/src/main/resources/toucheese-mvp-firebase-adminsdk.json
