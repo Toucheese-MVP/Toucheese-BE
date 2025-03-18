@@ -22,6 +22,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # Firebase 인증 파일 생성 (Base64 디코딩)
+      - name: Decode Firebase credentials
+        run: |              
+          echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 -d > ./src/main/resources/toucheese-mvp-firebase-adminsdk.json
+
       # application-secret 파일 생성
       - name: Decode application-secret
         run: |
