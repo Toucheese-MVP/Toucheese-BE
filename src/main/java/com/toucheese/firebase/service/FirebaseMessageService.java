@@ -27,23 +27,19 @@ public class FirebaseMessageService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void saveOrUpdateToken(Long memberId, String fcmToken) {
-        Optional<FcmToken> optFcmToken = fcmTokenRepository.findByMemberId(memberId);
-        // fcm 토큰이 저장되어있으면 -> 업데이트
-        if (optFcmToken.isPresent()) {
-            FcmToken targetFcm = optFcmToken.get();
-            targetFcm.setFcmToken(fcmToken);
-            fcmTokenRepository.save(targetFcm);
-        }
-        // fcm 토큰이 없으면 -> 생성
-        else {
-            fcmTokenRepository.save(FcmToken.builder()
-                    .member(memberRepository.findById(memberId)
-                            .orElseThrow(() -> new GlobalCustomException(ErrorCode.MEMBER_NOT_FOUND))
-                    )
-                    .fcmToken(fcmToken)
-                    .build());
-        }
+    public boolean saveOrUpdateToken(Long memberId, String fcmToken) {
+        return fcmTokenRepository.findByMemberId(memberId)
+                .map(existingToken -> {
+                    existingToken.setFcmToken(fcmToken); // ✅ 기존 토큰 업데이트
+                    return false; // 기존 토큰이 있어서 업데이트만 수행
+                })
+                .orElseGet(() -> {
+                    fcmTokenRepository.save(FcmToken.builder()
+                            .member(memberRepository.getReferenceById(memberId))
+                            .fcmToken(fcmToken)
+                            .build());
+                    return true; // ✅ 새로운 토큰이 생성됨
+                });
     }
 
 
@@ -58,11 +54,9 @@ public class FirebaseMessageService {
                 .build();
 
         try {
-            String response = FirebaseMessaging.getInstance().send(message);
-            return "Message sent sucessfully: " + response;
+            return FirebaseMessaging.getInstance().send(message);
         } catch (FirebaseMessagingException e) {
-            e.printStackTrace();
-            return "Failed to send message";
+            throw new GlobalCustomException(ErrorCode.FCM_SEND_FAILED);
         }
     }
 
