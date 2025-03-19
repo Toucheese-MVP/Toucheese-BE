@@ -18,9 +18,6 @@ public class FcmConfig {
     @Value("${firebase.config.path}")
     String firebaseConfigPath;
 
-    @Value("${firebase.config.projectId}")
-    String projectId;
-
 
     @Bean
     public FirebaseApp firebaseApp() {
@@ -30,10 +27,14 @@ public class FcmConfig {
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .setProjectId(projectId)
                     .build();
 
-            return FirebaseApp.initializeApp(options);
+            // FirebaseApp이 이미 초기화되었는지 확인
+            if (FirebaseApp.getApps().isEmpty()) {
+                return FirebaseApp.initializeApp(options);
+            } else {
+                return FirebaseApp.getInstance();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
