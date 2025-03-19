@@ -34,7 +34,7 @@ public interface FirebaseApi {
             }
     )
     @PostMapping
-    ResponseEntity<CommonResponse<?>> sendMessage(
+    ResponseEntity<CommonResponse<?>> sendPushMessage(
             Principal principal,
             @RequestBody FcmMessageRequest fcmMessageRequest
     );

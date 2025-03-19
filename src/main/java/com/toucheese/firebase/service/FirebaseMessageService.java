@@ -7,6 +7,7 @@ import com.google.firebase.messaging.Message;
 import com.toucheese.firebase.dto.FcmMessageRequest;
 import com.toucheese.firebase.entity.FcmToken;
 import com.toucheese.firebase.repository.FcmTokenRepository;
+import com.toucheese.firebase.utils.FirebaseUtils;
 import com.toucheese.global.exception.ErrorCode;
 import com.toucheese.global.exception.GlobalCustomException;
 import com.toucheese.member.repository.MemberRepository;
@@ -21,10 +22,9 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class FirebaseMessageService {
-    private final MemberService memberService;
-    private final FirebaseMessaging firebaseMessaging;
     private final FcmTokenRepository fcmTokenRepository;
     private final MemberRepository memberRepository;
+    private final FirebaseUtils firebaseUtils;
 
     @Transactional
     public boolean saveOrUpdateToken(Long memberId, String fcmToken) {
@@ -38,26 +38,16 @@ public class FirebaseMessageService {
                             .member(memberRepository.getReferenceById(memberId))
                             .fcmToken(fcmToken)
                             .build());
-                    return true; // ✅ 새로운 토큰이 생성됨
+                    return true; 
                 });
     }
 
 
-    public String sendMessage(Long memberId, FcmMessageRequest fcmMessageRequest) {
+    public void sendMessage(Long memberId, FcmMessageRequest fcmMessageRequest) {
         FcmToken memberFcmToken = fcmTokenRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new GlobalCustomException(ErrorCode.FCM_NOT_FOUND));
 
-        Message message = Message.builder()
-                .putData("title", fcmMessageRequest.title())
-                .putData("content", fcmMessageRequest.body())
-                .setToken(memberFcmToken.getFcmToken())
-                .build();
-
-        try {
-            return FirebaseMessaging.getInstance().send(message);
-        } catch (FirebaseMessagingException e) {
-            throw new GlobalCustomException(ErrorCode.FCM_SEND_FAILED);
-        }
+        firebaseUtils.sendMessage(memberFcmToken.getFcmToken(), fcmMessageRequest);
     }
 
 }

@@ -22,4 +22,7 @@ public class FcmToken {
     @Setter
     @Column(name = "fcm_token")
     private String fcmToken;
+
+    @Enumerated(EnumType.STRING)
+    private DeviceType deviceType;
 }

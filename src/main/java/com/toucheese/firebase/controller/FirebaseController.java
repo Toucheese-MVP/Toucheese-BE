@@ -54,12 +54,12 @@ public class FirebaseController implements FirebaseApi {
      * @return 매세지 전송 결과
      */
     @PostMapping("/send")
-    public ResponseEntity<CommonResponse<?>> sendMessage(
+    public ResponseEntity<CommonResponse<?>> sendPushMessage(
             Principal principal,
             @RequestBody FcmMessageRequest fcmMessageRequest
     ) {
         Long memberId = PrincipalUtils.extractMemberId(principal);
-        String response = firebaseMessageService.sendMessage(memberId, fcmMessageRequest);
-        return CommonResponse.ok(response).toResponseEntity();
+        firebaseMessageService.sendMessage(memberId, fcmMessageRequest);
+        return CommonResponse.ok("앱 푸시 알림이 성공적으로 전송되었습니다.").toResponseEntity();
     }
 }

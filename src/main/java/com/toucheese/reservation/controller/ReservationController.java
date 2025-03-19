@@ -36,81 +36,86 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "사용자 예약 API")
 @PreAuthorize("isAuthenticated()")
 public class ReservationController {
-	private final CartService cartService;
-	private final ReservationService reservationService;
-	private final ReservationReadService reservationReadService;
-	private final SolapiUtil solapiUtil;
+    private final CartService cartService;
+    private final ReservationService reservationService;
+    private final ReservationReadService reservationReadService;
+    private final SolapiUtil solapiUtil;
 
-	@Operation(
-		summary = "예약 기능",
-		description = """
-			선택한 장바구니를 결제하면 예약 테이블로 해당 데이터를 옮깁니다.
-			```json
-			{
-			    "cartIds": "1, 2, 3"    << String 입니다.
-			}
-			"""
-	)
-	@PostMapping
-	public ResponseEntity<?> acceptReservationAfterPayment(Principal principal,
-		@RequestBody CartIdsRequest cartIdsRequest) {
-		Long memberId = PrincipalUtils.extractMemberId(principal);
+    @Operation(
+            summary = "예약 기능",
+            description = """
+                    선택한 장바구니를 결제하면 예약 테이블로 해당 데이터를 옮깁니다.
+                    ```json
+                    {
+                        "cartIds": "1, 2, 3"    << String 입니다.
+                    }
+                    """
+    )
+    @PostMapping
+    public ResponseEntity<?> acceptReservationAfterPayment(
+            Principal principal,
+            @RequestBody CartIdsRequest cartIdsRequest
+    ) {
+        Long memberId = PrincipalUtils.extractMemberId(principal);
 
-		cartService.createReservationsFromCart(memberId, cartIdsRequest);
-		return SuccessResponse.createdSuccess("결제가 완료되었습니다.");
-	}
+        cartService.createReservationsFromCart(memberId, cartIdsRequest);
+        return SuccessResponse.createdSuccess("결제가 완료되었습니다.");
+    }
 
-	@Operation(summary = "사용자 예약 조회",
-		description = """
-		createDate = 예약날짜,
-		createTime = 예약시간""")
-	@GetMapping
-	public ResponseEntity<Page<ReservationResponse>> findReservations(Principal principal, @RequestParam int page) {
-		Long memberId = PrincipalUtils.extractMemberId(principal);
+    @Operation(summary = "사용자 예약 조회",
+            description = """
+                    createDate = 예약날짜,
+                    createTime = 예약시간""")
+    @GetMapping
+    public ResponseEntity<Page<ReservationResponse>> findReservations(
+            Principal principal,
+            @RequestParam int page
+    ) {
+        Long memberId = PrincipalUtils.extractMemberId(principal);
 
-		Page<ReservationResponse> reservations = reservationReadService.findPagedReservationsByMemberId(memberId, page);
-		return SuccessResponse.getObjectSuccess(reservations);
-	}
+        Page<ReservationResponse> reservations = reservationReadService.findPagedReservationsByMemberId(memberId, page);
+        return SuccessResponse.getObjectSuccess(reservations);
+    }
 
-	@Operation(summary = "사용자 예약 수정")
-	@PutMapping("/{reservationId}")
-	public ResponseEntity<?> updateReservationTime(
-		Principal principal,
-		@PathVariable Long reservationId,
-		@RequestBody ReservationUpdateRequest request
-	) {
-		Long memberId = PrincipalUtils.extractMemberId(principal);
+    @Operation(summary = "사용자 예약 수정")
+    @PutMapping("/{reservationId}")
+    public ResponseEntity<?> updateReservationTime(
+            Principal principal,
+            @PathVariable Long reservationId,
+            @RequestBody ReservationUpdateRequest request
+    ) {
+        Long memberId = PrincipalUtils.extractMemberId(principal);
 
-		reservationService.updateReservation(memberId, reservationId, request);
-		return SuccessResponse.updatedSuccess("예약 상태를 성공적으로 업데이트했습니다.");
-	}
+        reservationService.updateReservation(memberId, reservationId, request);
+        return SuccessResponse.updatedSuccess("예약 상태를 성공적으로 업데이트했습니다.");
+    }
 
-	@Operation(
-			summary = "즉시 예약 기능(iOS)",
-			description = """
-        사용자가 직접 예약 정보를 입력하여 즉시 예약을 생성합니다. / 엑세스 토큰이 필요합니다.
-        ```json
-        {
-            "productId": 1,
-            "studioId": 1,
-            "memberId": 1,
-            "phone": "010-1234-1234",
-            "totalPrice": 10000,
-            "createDate": "2025-01-21",
-            "createTime": "19:00",
-            "personnel": 2,
-            "addOptions": [1, 2]
-        }
-        ```
-    """
-	)
-	@PostMapping("/instant")
-	public ResponseEntity<ReservationSuccessResponse> createInstantReservation(Principal principal, @RequestBody ReservationRequest reservationRequest) {
-		Long memberId = PrincipalUtils.extractMemberId(principal);
+    @Operation(
+            summary = "즉시 예약 기능(iOS)",
+            description = """
+                        사용자가 직접 예약 정보를 입력하여 즉시 예약을 생성합니다. / 엑세스 토큰이 필요합니다.
+                        ```json
+                        {
+                            "productId": 1,
+                            "studioId": 1,
+                            "memberId": 1,
+                            "phone": "010-1234-1234",
+                            "totalPrice": 10000,
+                            "createDate": "2025-01-21",
+                            "createTime": "19:00",
+                            "personnel": 2,
+                            "addOptions": [1, 2]
+                        }
+                        ```
+                    """
+    )
+    @PostMapping("/instant")
+    public ResponseEntity<ReservationSuccessResponse> createInstantReservation(Principal principal, @RequestBody ReservationRequest reservationRequest) {
+        Long memberId = PrincipalUtils.extractMemberId(principal);
 
-		ReservationSuccessResponse response = reservationService.createInstantReservation(memberId, reservationRequest);
+        ReservationSuccessResponse response = reservationService.createInstantReservation(memberId, reservationRequest);
 
-		return ResponseEntity.ok(response);
-	}
+        return ResponseEntity.ok(response);
+    }
 
 }

@@ -2,6 +2,8 @@ package com.toucheese.reservation.service;
 
 import java.time.LocalDate;
 
+import com.toucheese.global.exception.ErrorCode;
+import com.toucheese.global.exception.GlobalCustomException;
 import com.toucheese.global.exception.ToucheeseBadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,8 +28,9 @@ public class ReservationReadService {
 	@Transactional(readOnly = true)
 	public Reservation findReservationById(Long reservationId) {
 		return reservationRepository.findById(reservationId)
-			.orElseThrow(() -> new ToucheeseBadRequestException("Reservation not found with ID: " + reservationId));
+			.orElseThrow(() -> new GlobalCustomException(ErrorCode.RESERVATION_NOT_FOUND));
 	}
+
 
 	@Transactional(readOnly = true)
 	public Page<Reservation> findReservationsByStatusAndDate(ReservationStatus status, LocalDate createDate,
