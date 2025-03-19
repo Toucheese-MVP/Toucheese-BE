@@ -24,8 +24,10 @@ jobs:
 
       # Firebase 인증 파일 생성 (Base64 디코딩)
       - name: Decode Firebase credentials
-        run: |              
-          echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 -d > ./src/main/resources/toucheese-mvp-firebase-adminsdk.json
+        run: |
+          echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 -d > ./src/main/resources/toucheese-mvp-firebase-adminsdk.json || { echo 'Firebase credentials decoding failed'; exit 1; }         
+          ls -l ./src/main/resources/toucheese-mvp-firebase-adminsdk.json  
+          cat ./src/main/resources/toucheese-mvp-firebase-adminsdk.json  
 
       # application-secret 파일 생성
       - name: Decode application-secret
