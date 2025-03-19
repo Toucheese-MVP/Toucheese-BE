@@ -1,8 +1,10 @@
 package com.toucheese.firebase.controller;
 
 
+import com.toucheese.firebase.dto.AndroidNotificationRequest;
 import com.toucheese.firebase.dto.FcmMessageRequest;
 import com.toucheese.firebase.dto.FcmDto;
+import com.toucheese.firebase.dto.iOSNotificationRequest;
 import com.toucheese.firebase.service.FirebaseMessageService;
 import com.toucheese.global.data.CommonResponse;
 import com.toucheese.global.data.SuccessResponse;
@@ -29,7 +31,7 @@ public class FirebaseController implements FirebaseApi {
      * FCM 토큰 등록 및 업데이트
      *
      * @param principal 사용자 인증 정보
-     * @param fcmDto fcm 토큰
+     * @param fcmDto    fcm 토큰
      * @return 저장 or 업데이트 응답 메세지
      */
     @PostMapping
@@ -47,19 +49,36 @@ public class FirebaseController implements FirebaseApi {
     }
 
     /**
-     * FCM 메세지 전송
+     * FCM 메세지 전송 (iOS)
      *
-     * @param principal 사용자 인증 정보
-     * @param fcmMessageRequest 메세지 내용 (title, body)
+     * @param principal              사용자 인증 정보
+     * @param iOSNotificationRequest 메세지 내용
      * @return 매세지 전송 결과
      */
-    @PostMapping("/send")
-    public ResponseEntity<CommonResponse<?>> sendPushMessage(
+    @PostMapping("/ios/send")
+    public ResponseEntity<CommonResponse<?>> sendIosNotification(
             Principal principal,
-            @RequestBody FcmMessageRequest fcmMessageRequest
+            @RequestBody iOSNotificationRequest iOSNotificationRequest
     ) {
         Long memberId = PrincipalUtils.extractMemberId(principal);
-        firebaseMessageService.sendMessage(memberId, fcmMessageRequest);
+        firebaseMessageService.sendIosNotification(memberId, iOSNotificationRequest);
+        return CommonResponse.ok("앱 푸시 알림이 성공적으로 전송되었습니다.").toResponseEntity();
+    }
+
+    /**
+     * FCM 메세지 전송 (Android)
+     *
+     * @param principal                  사용자 인증 정보
+     * @param androidNotificationRequest 메세지 내용
+     * @return 매세지 전송 결과
+     */
+    @PostMapping("/android/send")
+    public ResponseEntity<CommonResponse<?>> sendAndroidNotification(
+            Principal principal,
+            @RequestBody AndroidNotificationRequest androidNotificationRequest
+    ) {
+        Long memberId = PrincipalUtils.extractMemberId(principal);
+        firebaseMessageService.sendAndroidNotification(memberId, androidNotificationRequest);
         return CommonResponse.ok("앱 푸시 알림이 성공적으로 전송되었습니다.").toResponseEntity();
     }
 }

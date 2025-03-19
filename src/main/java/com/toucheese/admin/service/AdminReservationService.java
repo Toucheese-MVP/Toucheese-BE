@@ -3,6 +3,7 @@ package com.toucheese.admin.service;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import com.toucheese.firebase.dto.AndroidNotificationRequest;
 import com.toucheese.firebase.dto.FcmMessageRequest;
 import com.toucheese.firebase.entity.FcmToken;
 import com.toucheese.firebase.repository.FcmTokenRepository;
@@ -68,12 +69,12 @@ public class AdminReservationService {
         // Android FCM 푸시 알림
         FcmToken fcmToken = fcmTokenRepository.findByMemberId(member.getId())
                 .orElseThrow(() -> new GlobalCustomException(ErrorCode.FCM_NOT_FOUND));
-        FcmMessageRequest fcmMessageRequest = FcmMessageRequest.builder()
+        AndroidNotificationRequest androidNotificationRequest = AndroidNotificationRequest.builder()
                 .title(String.format("[터치즈] %s 알림", newStatus))
                 .body(String.format("'%s' 예약이 '%s' 처리 되었습니다.", reservation.getStudio().getName(), newStatus))
                 .build();
 
-        firebaseUtils.sendMessage(fcmToken.getFcmToken(), fcmMessageRequest);
+        firebaseUtils.sendAndroidMessage(fcmToken.getFcmToken(), androidNotificationRequest);
 
         // TODO: iOS FCM 푸시 알림
     }

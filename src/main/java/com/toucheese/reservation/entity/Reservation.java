@@ -3,11 +3,9 @@ package com.toucheese.reservation.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.toucheese.cart.dto.CartRequest;
 import com.toucheese.member.entity.Member;
 import com.toucheese.product.entity.Product;
 import com.toucheese.reservation.dto.ReservationUpdateRequest;
