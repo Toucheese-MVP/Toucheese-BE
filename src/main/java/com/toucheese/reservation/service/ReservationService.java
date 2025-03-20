@@ -148,8 +148,7 @@ public class ReservationService {
 		reservationRepository.save(reservation);
 
 		String messageText = solapiUtil.formatMessage(member.getName());
-		String registeredSenderNumber = "01098455844";
-		solapiUtil.send(registeredSenderNumber, member.getPhone(), messageText);
+		solapiUtil.send(member.getPhone(), messageText);
 
 		return ReservationSuccessResponse.builder()
 				.status(true)

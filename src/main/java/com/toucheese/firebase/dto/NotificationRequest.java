@@ -14,9 +14,6 @@ public record NotificationRequest(
         @Schema(description = "알림 본문")
         String body
 ) {
-        @Builder
-        public NotificationRequest {}
-
         public Notification toNotification() {
                 return Notification.builder()
                         .setTitle(title)
