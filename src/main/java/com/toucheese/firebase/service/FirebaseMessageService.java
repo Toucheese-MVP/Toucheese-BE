@@ -2,8 +2,7 @@ package com.toucheese.firebase.service;
 
 
 
-import com.toucheese.firebase.dto.AndroidNotificationRequest;
-import com.toucheese.firebase.dto.iOSNotificationRequest;
+import com.toucheese.firebase.dto.NotificationRequest;
 import com.toucheese.firebase.entity.FcmToken;
 import com.toucheese.firebase.repository.FcmTokenRepository;
 import com.toucheese.firebase.utils.FirebaseUtils;
@@ -40,18 +39,12 @@ public class FirebaseMessageService {
     }
 
 
-    public void sendIosNotification(Long memberId, iOSNotificationRequest iOSNotificationRequest) {
+    public void sendNotification(Long memberId, NotificationRequest notificationRequest) {
         FcmToken memberFcmToken = fcmTokenRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new GlobalCustomException(ErrorCode.FCM_NOT_FOUND));
 
-        firebaseUtils.sendIosMessage(memberFcmToken.getFcmToken(), iOSNotificationRequest);
+        firebaseUtils.sendMessage(memberFcmToken.getFcmToken(), notificationRequest);
     }
 
-    public void sendAndroidNotification(Long memberId, AndroidNotificationRequest androidNotificationRequest) {
-        FcmToken memberFcmToken = fcmTokenRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.FCM_NOT_FOUND));
-
-        firebaseUtils.sendAndroidMessage(memberFcmToken.getFcmToken(), androidNotificationRequest);
-    }
 
 }

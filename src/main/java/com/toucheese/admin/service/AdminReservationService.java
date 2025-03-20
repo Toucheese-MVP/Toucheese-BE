@@ -1,18 +1,14 @@
 package com.toucheese.admin.service;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
-import com.toucheese.firebase.dto.AndroidNotificationRequest;
-import com.toucheese.firebase.dto.FcmMessageRequest;
+import com.toucheese.firebase.dto.NotificationRequest;
 import com.toucheese.firebase.entity.FcmToken;
 import com.toucheese.firebase.repository.FcmTokenRepository;
 import com.toucheese.firebase.utils.FirebaseUtils;
 import com.toucheese.global.exception.ErrorCode;
 import com.toucheese.global.exception.GlobalCustomException;
 import com.toucheese.member.entity.Member;
-import com.toucheese.member.repository.MemberRepository;
-import com.toucheese.reservation.repository.ReservationRepository;
 import com.toucheese.solapi.util.SolapiUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,7 +23,6 @@ import com.toucheese.reservation.entity.ReservationStatus;
 import com.toucheese.reservation.service.ReservationReadService;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -66,16 +61,15 @@ public class AdminReservationService {
         String registeredSenderNumber = "01098455844";
         solapiUtil.send(registeredSenderNumber, reservation.getMember().getPhone(), messageText);
 
-        // Android FCM 푸시 알림
+        // FCM 푸시 알림
         FcmToken fcmToken = fcmTokenRepository.findByMemberId(member.getId())
                 .orElseThrow(() -> new GlobalCustomException(ErrorCode.FCM_NOT_FOUND));
-        AndroidNotificationRequest androidNotificationRequest = AndroidNotificationRequest.builder()
+        NotificationRequest notificationRequest = NotificationRequest.builder()
                 .title(String.format("[터치즈] %s 알림", newStatus))
                 .body(String.format("'%s' 예약이 '%s' 처리 되었습니다.", reservation.getStudio().getName(), newStatus))
                 .build();
 
-        firebaseUtils.sendAndroidMessage(fcmToken.getFcmToken(), androidNotificationRequest);
+        firebaseUtils.sendMessage(fcmToken.getFcmToken(), notificationRequest);
 
-        // TODO: iOS FCM 푸시 알림
     }
 }

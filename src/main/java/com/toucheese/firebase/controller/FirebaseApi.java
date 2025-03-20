@@ -1,8 +1,7 @@
 package com.toucheese.firebase.controller;
 
-import com.toucheese.firebase.dto.AndroidNotificationRequest;
 import com.toucheese.firebase.dto.FcmDto;
-import com.toucheese.firebase.dto.iOSNotificationRequest;
+import com.toucheese.firebase.dto.NotificationRequest;
 import com.toucheese.global.data.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
@@ -24,22 +23,12 @@ public interface FirebaseApi {
     );
 
     @Operation(
-            summary = "FCM 메세지 전송 (IOS)",
+            summary = "FCM 메세지 전송 (플랫폼 공통)",
             description = "FCM 메세지를 사용자에게 전송합니다."
     )
     @PostMapping
-    ResponseEntity<CommonResponse<?>> sendIosNotification(
+    ResponseEntity<CommonResponse<?>> sendNotification(
             Principal principal,
-            @RequestBody iOSNotificationRequest iOSNotificationRequest
-    );
-
-    @Operation(
-            summary = "FCM 메세지 전송 (Android)",
-            description = "FCM 메세지를 사용자에게 전송합니다."
-    )
-    @PostMapping
-    ResponseEntity<CommonResponse<?>> sendAndroidNotification(
-            Principal principal,
-            @RequestBody AndroidNotificationRequest androidNotificationRequest
+            @RequestBody NotificationRequest notificationRequest
     );
 }
