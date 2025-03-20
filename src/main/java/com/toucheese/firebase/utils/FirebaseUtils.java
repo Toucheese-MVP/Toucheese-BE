@@ -1,27 +1,23 @@
 package com.toucheese.firebase.utils;
 
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.toucheese.firebase.dto.NotificationRequest;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
-import com.toucheese.firebase.dto.NotificationRequest;
-import com.toucheese.global.exception.ErrorCode;
-import com.toucheese.global.exception.GlobalCustomException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
+@RequiredArgsConstructor
 public class FirebaseUtils {
-    public void sendMessage(String fcmToken, NotificationRequest notificationRequest) {
+    private final FirebaseMessaging firebaseMessaging;
+
+    public void sendMessage(String fcmToken, NotificationRequest notificationRequest) throws FirebaseMessagingException {
         Message message = Message.builder()
-                .putData("title", notificationRequest.title())
-                .putData("body", String.valueOf(notificationRequest.body()))
-                .putAllData(notificationRequest.data())
                 .setToken(fcmToken)
+                .setNotification(notificationRequest.toNotification())
                 .build();
-        try {
-            FirebaseMessaging.getInstance().send(message);
-        } catch (FirebaseMessagingException e) {
-            throw new GlobalCustomException(ErrorCode.FCM_SEND_FAILED);
-        }
+        firebaseMessaging.send(message);
     }
 }

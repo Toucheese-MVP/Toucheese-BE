@@ -2,6 +2,7 @@ package com.toucheese.admin.service;
 
 import java.time.LocalDate;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.toucheese.firebase.dto.NotificationRequest;
 import com.toucheese.firebase.entity.FcmToken;
 import com.toucheese.firebase.repository.FcmTokenRepository;
@@ -47,7 +48,7 @@ public class AdminReservationService {
     }
 
     @Transactional
-    public void updateReservationStatus(Long reservationId, ReservationStatus newStatus) {
+    public void updateReservationStatus(Long reservationId, ReservationStatus newStatus) throws FirebaseMessagingException {
         Reservation reservation = reservationReadService.findReservationById(reservationId);
         Member member = reservation.getMember();
 
@@ -55,7 +56,7 @@ public class AdminReservationService {
         reservation.updateStatus(newStatus); // dirty checking
     }
 
-    private void snedMessage(ReservationStatus newStatus, Reservation reservation, Member member) {
+    private void snedMessage(ReservationStatus newStatus, Reservation reservation, Member member) throws FirebaseMessagingException {
         // 문자 메시지 전송
         String messageText = solapiUtil.determineFormatMessage(reservation.getMember().getName());
         String registeredSenderNumber = "01098455844";

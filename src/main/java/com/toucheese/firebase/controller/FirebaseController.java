@@ -1,6 +1,7 @@
 package com.toucheese.firebase.controller;
 
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.toucheese.firebase.dto.FcmDto;
 import com.toucheese.firebase.dto.NotificationRequest;
 import com.toucheese.firebase.service.FirebaseMessageService;
@@ -55,7 +56,7 @@ public class FirebaseController implements FirebaseApi {
     public ResponseEntity<CommonResponse<?>> sendNotification(
             Principal principal,
             @RequestBody NotificationRequest notificationRequest
-    ) {
+    ) throws FirebaseMessagingException {
         Long memberId = PrincipalUtils.extractMemberId(principal);
         firebaseMessageService.sendNotification(memberId, notificationRequest);
         return CommonResponse.ok("앱 푸시 알림이 성공적으로 전송되었습니다.").toResponseEntity();

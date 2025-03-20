@@ -1,5 +1,6 @@
 package com.toucheese.firebase.controller;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.toucheese.firebase.dto.FcmDto;
 import com.toucheese.firebase.dto.NotificationRequest;
 import com.toucheese.global.data.CommonResponse;
@@ -30,5 +31,5 @@ public interface FirebaseApi {
     ResponseEntity<CommonResponse<?>> sendNotification(
             Principal principal,
             @RequestBody NotificationRequest notificationRequest
-    );
+    ) throws FirebaseMessagingException;
 }

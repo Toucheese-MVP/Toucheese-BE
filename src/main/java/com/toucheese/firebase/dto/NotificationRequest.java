@@ -1,19 +1,27 @@
 package com.toucheese.firebase.dto;
 
+import com.google.firebase.messaging.Notification;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
-import java.util.Map;
 
 @Builder
 public record NotificationRequest(
         @Schema(description = "알림 제목")
-        @NotNull(message = "알림 제목은 필수입니다.")
+        @NotBlank
         String title,
         @Schema(description = "알림 본문")
-        String body,
-        @Schema(description = "데이터 메세지 (앱이 포그라운드에서 처리하는 용도)")
-        Map<String, String> data
+        String body
 ) {
+        @Builder
+        public NotificationRequest {}
+
+        public Notification toNotification() {
+                return Notification.builder()
+                        .setTitle(title)
+                        .setBody(body)
+                        .build();
+        }
+
 }
