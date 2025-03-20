@@ -2,6 +2,7 @@ package com.toucheese.admin.controller;
 
 import java.time.LocalDate;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.toucheese.solapi.util.SolapiUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +50,7 @@ public class AdminReservationController {
 	public ResponseEntity<?> updateReservationStatus(
 			@PathVariable Long reservationId,
 			@RequestBody UpdateReservationStatusRequest request
-	) {
+	) throws FirebaseMessagingException {
 		// 요청에서 전달된 상태를 사용하여 예약 상태 업데이트
 		adminReservationService.updateReservationStatus(reservationId, request.status());
 		return SuccessResponse.updatedSuccess("예약 상태를 성공적으로 업데이트했습니다.");

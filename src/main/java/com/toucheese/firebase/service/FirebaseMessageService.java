@@ -2,6 +2,7 @@ package com.toucheese.firebase.service;
 
 
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.toucheese.firebase.dto.NotificationRequest;
 import com.toucheese.firebase.entity.FcmToken;
 import com.toucheese.firebase.repository.FcmTokenRepository;
@@ -39,7 +40,7 @@ public class FirebaseMessageService {
     }
 
 
-    public void sendNotification(Long memberId, NotificationRequest notificationRequest) {
+    public void sendNotification(Long memberId, NotificationRequest notificationRequest) throws FirebaseMessagingException {
         FcmToken memberFcmToken = fcmTokenRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new GlobalCustomException(ErrorCode.FCM_NOT_FOUND));
 
