@@ -24,9 +24,6 @@ public class MessageService {
     private final EmailUtil emailUtil;
     private final MemberService memberService;
 
-    @Value("${solapi.from-number}")
-    private String fromNumber; // 고정 발신 번호
-
     @Async("customTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleReservationMessageEvent(ReservationMessageEvent event) {
@@ -48,7 +45,7 @@ public class MessageService {
 
     @Async("customTaskExecutor")
     public void sendSms(String phone, String messageText) {
-        solapiUtil.send(fromNumber, phone, messageText);
+        solapiUtil.send(phone, messageText);
     }
 
     @Async("customTaskExecutor")

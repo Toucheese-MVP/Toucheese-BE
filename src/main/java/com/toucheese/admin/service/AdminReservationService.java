@@ -52,25 +52,34 @@ public class AdminReservationService {
         Reservation reservation = reservationReadService.findReservationById(reservationId);
         Member member = reservation.getMember();
 
-        snedMessage(newStatus, reservation, member);
+        sendSmsNotification(newStatus, member); // SMS 전송
+        sendFcmNotification(newStatus, reservation, member); // FCM 푸시 알림 전송
+
         reservation.updateStatus(newStatus); // dirty checking
     }
 
-    private void snedMessage(ReservationStatus newStatus, Reservation reservation, Member member) throws FirebaseMessagingException {
-        // 문자 메시지 전송
-        String messageText = solapiUtil.determineFormatMessage(reservation.getMember().getName());
-        String registeredSenderNumber = "01098455844";
-        solapiUtil.send(registeredSenderNumber, reservation.getMember().getPhone(), messageText);
+    private void sendSmsNotification(ReservationStatus newStatus, Member member) {
+        String messageText;
 
-        // FCM 푸시 알림
+        if (newStatus.equals(ReservationStatus.예약확정)) {
+            messageText = solapiUtil.determineFormatMessage(member.getName());
+            solapiUtil.send(member.getPhone(), messageText);
+        }
+        else if (newStatus.equals(ReservationStatus.예약취소)) {
+            messageText = solapiUtil.cancelFormatMessage(member.getName());
+            solapiUtil.send(member.getPhone(), messageText);
+        }
+    }
+
+    private void sendFcmNotification(ReservationStatus newStatus, Reservation reservation, Member member) throws FirebaseMessagingException {
         FcmToken fcmToken = fcmTokenRepository.findByMemberId(member.getId())
                 .orElseThrow(() -> new GlobalCustomException(ErrorCode.FCM_NOT_FOUND));
+
         NotificationRequest notificationRequest = NotificationRequest.builder()
                 .title(String.format("[터치즈] %s 알림", newStatus))
                 .body(String.format("'%s' 예약이 '%s' 처리 되었습니다.", reservation.getStudio().getName(), newStatus))
                 .build();
 
         firebaseUtils.sendMessage(fcmToken.getFcmToken(), notificationRequest);
-
     }
 }
