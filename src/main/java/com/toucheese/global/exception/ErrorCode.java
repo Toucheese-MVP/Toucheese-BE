@@ -38,7 +38,6 @@ public enum ErrorCode {
     REQUEST_TIMEOUT(4020, HttpStatus.REQUEST_TIMEOUT, "요청 시간 Timeout" ),
     FCM_NOT_FOUND(4021, HttpStatus.BAD_REQUEST, "회원님의 FCM 토큰을 찾을 수 없습니다." ),
     FCM_SEND_FAILED(4022, HttpStatus.BAD_REQUEST, "FCM 메세지 전송 실패"),
-    FCM_JSON_CONVERT_FAILED(4023, HttpStatus.BAD_REQUEST, "FCM 메세지 전송중 데이터 JSON 변환 실패"),
 
     
     // NOT_SAME_PASSWORD(4020, HttpStatus.BAD_REQUEST, "아이디 및 비밀번호가 일치하지 않습니다.")
