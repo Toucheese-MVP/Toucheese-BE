@@ -86,73 +86,117 @@ public class ReservationService {
 		reservation.updateReservationStatusAndTime(request);
 	}
 
+	// 즉시 예약 메서드(iOS용)
 	@Transactional
 	public ReservationSuccessResponse createInstantReservation(Long memberId, ReservationRequest reservationRequest) {
-
 		// 요청된 회원 ID 로그
-		System.out.println("회원 ID: " + memberId);
+		logMemberId(memberId);
 
+		// 회원 정보 조회 및 전화번호 업데이트
+		Member member = getMemberAndUpdatePhone(memberId, reservationRequest.phone());
+
+		// 상품 추가 옵션 조회
+		List<ReservationProductAddOption> reservationProductAddOptions = getReservationProductAddOptions(reservationRequest);
+
+		// 새로운 예약 생성
+		Reservation reservation = createReservation(reservationRequest, member, reservationProductAddOptions);
+
+		// 예약 저장 및 문자 메시지 전송
+		reservationRepository.save(reservation);
+		sendReservationMessage(member);
+
+		return ReservationSuccessResponse.builder()
+				.status(true)
+				.build();
+	}
+
+	// 즉시 예약 메서드(iOS용) - 리팩토링(실행 시 로그에 회원 ID가 잘 나오는지 확인하기 위함.)
+	private void logMemberId(Long memberId) {
+		System.out.println("회원 ID: " + memberId);
+	}
+
+	// 즉시 예약 메서드(iOS용) - 리팩토링
+	// 회원 ID와 회원의 전화번호를 찾는 메서드
+	private Member getMemberAndUpdatePhone(Long memberId, String requestPhone) {
+		// 회원 ID 조회
+		Optional<Member> memberOpt = memberRepository.findById(memberId);
+
+		// 회원 ID가 없을 시 -> 예외 처리
+		if (memberOpt.isEmpty()) {
+			throw new GlobalCustomException(ErrorCode.MEMBER_NOT_FOUND);
+		}
+
+		// 회원 ID 조회
+		Member member = memberOpt.get();
+
+		// 회원 데이터에 회원의 전화번호가 비어 있는지를 확인하고, 비어 있다면 요청된 전화번호로 업데이트
+		if (!StringUtils.hasText(member.getPhone())) {
+			updateMemberPhone(member, requestPhone);
+		}
+
+		// 회원 반환
+		return member;
+	}
+
+	// 즉시 예약 메서드(iOS용) - 리팩토링
+	// 회원의 전화번호를 업데이트하는 메서드
+	private void updateMemberPhone(Member member, String requestPhone) {
+		// 전화번호 유효성 검사
+		if (StringUtils.hasText(requestPhone)) {
+			// 전화번호 업데이트
+			log.info("{}님의 전화번호가 {}로 업데이트 되었습니다.", member.getName(), requestPhone);
+			member.setPhone(requestPhone);
+			memberRepository.save(member);
+		} else { // 전화번호가 유효하지 않은 경우
+			log.info("요청에 전화번호 필드가 null 이거나 값이 비어있습니다.");
+			throw new GlobalCustomException(ErrorCode.PHONE_REQUEST_NOT_FOUND);
+		}
+	}
+
+	// 즉시 예약 메서드(iOS용) - 리팩토링
+	// 예약 요청에 포함된 추가 옵션을 기반으로 예약 상품 추가 옵션 목록을 생성하는 메서드
+	private List<ReservationProductAddOption> getReservationProductAddOptions(ReservationRequest reservationRequest) {
 		// 상품 추가 옵션 조회
 		List<ProductAddOption> productAddOptions = productService.findProductAddOptionsByProductIdAndAddOptionIds(
 				reservationRequest.productId(), reservationRequest.addOptions()
 		);
 
-		List<ReservationProductAddOption> reservationProductAddOptions =
-				productAddOptions.stream()
-						.map(productAddOption -> new ReservationProductAddOption(
-								productAddOption,
-								productAddOption.getAddOptionPrice()
-						))
-						.collect(Collectors.toList());
+		// 예약 상품 추가 옵션 변환
+		return productAddOptions.stream()
+				.map(productAddOption -> new ReservationProductAddOption(
+						productAddOption,
+						productAddOption.getAddOptionPrice()
+				))
+				.collect(Collectors.toList());
+	}
 
-		// 회원 ID에 대한 회원 정보 조회
-		Optional<Member> memberOpt = memberRepository.findById(memberId);
-
-		// 회원이 존재하지 않을 경우 예외 처리
-		if (memberOpt.isEmpty()) {
-			throw new GlobalCustomException(ErrorCode.MEMBER_NOT_FOUND);
-		}
-
-		// 회원의 전화번호 유무 확인
-		Member member = memberOpt.get();
-		if (!StringUtils.hasText(member.getPhone())) {  // 기존 전화번호가 없는 경우
-			log.info("{}님의 전화번호가 비어있습니다.", member.getName());
-
-			String requestPhone = reservationRequest.phone();
-
-			if (StringUtils.hasText(requestPhone)) {  // 요청한 전화번호가 존재할 경우에만 업데이트
-				log.info("{}님의 전화번호가 {}로 업데이트 되었습니다.", member.getName(), requestPhone);
-				member.setPhone(requestPhone);
-				memberRepository.save(member);
-			} else {
-				log.info("요청에 전화번호 필드가 null 이거나 값이 비어있습니다.");
-				throw new GlobalCustomException(ErrorCode.PHONE_REQUEST_NOT_FOUND);
-			}
-		}
-
-		// 새로운 예약 생성
-		Reservation reservation = Reservation.builder()
+	// 즉시 예약 메서드(iOS용) - 리팩토링
+	// 예약을 생성하는 메서드
+	private Reservation createReservation(ReservationRequest reservationRequest, Member member, List<ReservationProductAddOption> reservationProductAddOptions) {
+		// 예약 객체 생성
+		return Reservation.builder()
+				// 요청된 상품 ID를 사용해 해당 상품 조회 + 예약 객체에 설정
 				.product(productService.findProductById(reservationRequest.productId()))
+				// 요청된 스튜디오 ID를 사용해 해당 스튜디오 조회 + 예약 객체에 설정
 				.studio(studioService.findStudioById(reservationRequest.studioId()))
-				.member(member)
-				.phone(member.getPhone()) // 회원의 전화번호 사용
-				.totalPrice(reservationRequest.totalPrice())
-				.createDate(reservationRequest.createDate())
-				.createTime(reservationRequest.createTime())
-				.personnel(reservationRequest.personnel())
-				.reservationProductAddOptions(reservationProductAddOptions)
-				.status(ReservationStatus.예약접수)
+				.member(member) // 예약한 회원 정보 설정
+				.phone(member.getPhone()) // 회원의 전화번호 설정
+				.totalPrice(reservationRequest.totalPrice()) // 예약의 총 가격 설정
+				.createDate(reservationRequest.createDate()) // 예약 생성 날짜 설정
+				.createTime(reservationRequest.createTime()) // 예약 생성 시간 설정
+				.personnel(reservationRequest.personnel()) //예약 인원 수 설정
+				.reservationProductAddOptions(reservationProductAddOptions) // 예약 상품 추가 옵션 리스트 설정
+				.status(ReservationStatus.예약접수) // 예약 상태를 '예약 접수'로 설정
+				// 예약 완료 시간을 현재 시간으로 설정
 				.reservationCompletedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
 				.build();
+	}
 
-		reservationRepository.save(reservation);
-
-		String messageText = solapiUtil.formatMessage(member.getName());
-		solapiUtil.send(member.getPhone(), messageText);
-
-		return ReservationSuccessResponse.builder()
-				.status(true)
-				.build();
+	// 즉시 예약 메서드(iOS용) - 리팩토링
+	// 예약 완료 후 회원에게 문자 메시지를 전송하는 메서드
+	private void sendReservationMessage(Member member) {
+		String messageText = solapiUtil.formatMessage(member.getName()); // 메시지 텍스트 생성
+		solapiUtil.send(member.getPhone(), messageText); // 문자 메시지 전송
 	}
 
 	/*
