@@ -38,7 +38,7 @@ public class FirebaseController implements FirebaseApi {
     ) {
         Long memberId = PrincipalUtils.extractMemberId(principal);
         boolean isNewToken = firebaseMessageService.saveOrUpdateToken(memberId, fcmDto.fcmToken());
-        if (isNewToken) {
+        if (!isNewToken) {
             return CommonResponse.created("FCM 토큰이 성공적으로 저장되었습니다.").toResponseEntity();
         }
         return CommonResponse.updated("FCM 토큰이 업데이트 되었습니다.").toResponseEntity();
@@ -56,7 +56,7 @@ public class FirebaseController implements FirebaseApi {
     public ResponseEntity<CommonResponse<?>> sendNotification(
             Principal principal,
             @RequestBody NotificationRequest notificationRequest
-    ) throws FirebaseMessagingException {
+    ){
         Long memberId = PrincipalUtils.extractMemberId(principal);
         firebaseMessageService.sendNotification(memberId, notificationRequest);
         return CommonResponse.ok("앱 푸시 알림이 성공적으로 전송되었습니다.").toResponseEntity();
