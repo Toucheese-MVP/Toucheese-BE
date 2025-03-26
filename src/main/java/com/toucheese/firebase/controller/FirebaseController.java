@@ -45,7 +45,7 @@ public class FirebaseController {
     public ResponseEntity<String> sendMessage(
             @RequestBody FcmMessageRequest requestDto
     ) {
-        String response = firebaseMessageService.sendMessage(requestDto);
+        String response = String.valueOf(firebaseMessageService.sendMessage(requestDto));
         return ResponseEntity.ok(response);
     }
 }

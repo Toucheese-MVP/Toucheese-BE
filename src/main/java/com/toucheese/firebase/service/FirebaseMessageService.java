@@ -13,12 +13,16 @@ import com.toucheese.member.repository.MemberRepository;
 import com.toucheese.member.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class FirebaseMessageService {
     private final MemberService memberService;
@@ -46,24 +50,26 @@ public class FirebaseMessageService {
         }
     }
 
+    @Async
+    public CompletableFuture<String> sendMessage(FcmMessageRequest requestDto) {
+        return CompletableFuture.supplyAsync(() -> {
+            FcmToken memberFcmToken = fcmTokenRepository.findByMemberId(requestDto.memberId())
+                    .orElseThrow(() -> new GlobalCustomException(ErrorCode.FCM_NOT_FOUND));
 
-    public String sendMessage(FcmMessageRequest requestDto) {
-        FcmToken memberFcmToken = fcmTokenRepository.findByMemberId(requestDto.memberId())
-                .orElseThrow(() -> new GlobalCustomException(ErrorCode.FCM_NOT_FOUND));
+            Message message = Message.builder()
+                    .putData("title", requestDto.title())
+                    .putData("content", requestDto.body())
+                    .setToken(memberFcmToken.getFcmToken())
+                    .build();
 
-        Message message = Message.builder()
-                .putData("title", requestDto.title())
-                .putData("content", requestDto.body())
-                .setToken(memberFcmToken.getFcmToken())
-                .build();
+            try {
+                return "Message sent successfully: " + FirebaseMessaging.getInstance().send(message);
+            } catch (FirebaseMessagingException e) {
+                log.error("FCM 메시지 전송 실패: memberId={}, error={}", requestDto.memberId(), e.getMessage(), e);
+                return "Failed to send message";
+            }
+        });
 
-        try {
-            String response = FirebaseMessaging.getInstance().send(message);
-            return "Message sent sucessfully: " + response;
-        } catch (FirebaseMessagingException e) {
-            e.printStackTrace();
-            return "Failed to send message";
-        }
     }
 
 }
