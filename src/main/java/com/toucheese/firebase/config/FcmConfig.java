@@ -16,18 +16,18 @@ public class FcmConfig {
 
     @Bean
     FirebaseApp firebaseApp() throws IOException {
-        FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(firebaseResource.getInputStream()))
-                .build();
-        return FirebaseApp.initializeApp(options);
+        if (FirebaseApp.getApps().isEmpty()) {
+            FirebaseOptions options = FirebaseOptions.builder()
+                    .setCredentials(GoogleCredentials.fromStream(firebaseResource.getInputStream()))
+                    .build();
+            return FirebaseApp.initializeApp(options);
+        } else {
+            return FirebaseApp.getInstance();
+        }
     }
 
     @Bean
     FirebaseMessaging firebaseMessaging() throws IOException {
         return FirebaseMessaging.getInstance(firebaseApp());
     }
-
-
-
-
 }
