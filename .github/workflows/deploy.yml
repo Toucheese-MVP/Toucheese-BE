@@ -1,0 +1,104 @@
+name: Docker Image Delivery
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deliver:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      # 이미지 태그 설정
+      - name: Set Image Tag
+        id: image-tag
+        run: echo "TAG=$(date +%s)-ci" >> "$GITHUB_ENV"
+
+      # Docker Hub 로그인
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Firebase 인증 파일 생성
+      - name: Decode Firebase credentials
+        run: |
+          echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 -d > ./src/main/resources/toucheese-mvp-firebase-adminsdk.json || { echo 'Firebase credentials decoding failed'; exit 1; }         
+          ls -l ./src/main/resources/toucheese-mvp-firebase-adminsdk.json  
+          cat ./src/main/resources/toucheese-mvp-firebase-adminsdk.json  
+
+      # application-secret 파일 생성
+      - name: Decode application-secret
+        run: |
+          echo "${{ secrets.APPLICATION_SECRET }}" | base64 -d > ./src/main/resources/application-secret.yml
+
+      # Apple Private Key 파일 생성
+      - name: Decode Apple Private Key
+        run: |
+          mkdir -p ./src/main/resources/key
+          echo "${{ secrets.APPLE_PRIVATE_KEY }}" | base64 -d > ./src/main/resources/key/apple_private_key.pem
+
+      # Docker Build & Push
+      - name: Build and Push the Docker image
+        env:
+          TAG: ${{ steps.image-tag.outputs.TAG }}
+        run: |
+          docker buildx create --use
+          docker buildx build --platform linux/amd64 \
+            --build-arg APPLICATION_SECRET_FILE=application-secret \
+            --build-arg APPLE_PRIVATE_KEY_FILE=apple_private_key \
+            --tag "toucheese/app:$TAG" --push .
+
+      # latest 태그로 덧붙여서 푸시하기
+      - name: Tag Image as latest
+        env:
+          TAG: ${{ steps.image-tag.outputs.TAG }}
+        run: |
+          docker pull "toucheese/app:$TAG"
+          docker tag "toucheese/app:$TAG" "toucheese/app:latest"
+      - name: Push latest
+        run: docker push "toucheese/app:latest"
+
+      # 현재 활성 컨테이너 확인 (app-blue 또는 app-green)
+      - name: Determine Active Backend
+        id: active-backend
+        run: |
+          ACTIVE_CONTAINER=$(ssh -o StrictHostKeyChecking=no ubuntu@43.200.3.226 "docker ps --format '{{.Names}}' | grep app-blue || echo 'app-green'")
+          if [ "$ACTIVE_CONTAINER" = "app-blue" ]; then
+            echo "NEW_CONTAINER=app-green" >> "$GITHUB_ENV"
+          else
+            echo "NEW_CONTAINER=app-blue" >> "$GITHUB_ENV"
+          fi
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # 새로운 컨테이너 실행
+      - name: Deploy new container
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@43.200.3.226 << EOF
+            docker pull toucheese/app:latest
+            docker stop $NEW_CONTAINER || true
+            docker rm $NEW_CONTAINER || true
+            docker run -d --name $NEW_CONTAINER -p 8080:8080 toucheese/app:latest
+          EOF
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # nginx.conf 내 `backend`를 업데이트하고 Reload
+      - name: Update Nginx Configuration
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@43.200.3.226 << EOF
+            sudo sed -i 's/server app-[a-z]*:8080;/server $NEW_CONTAINER:8080;/' /etc/nginx/nginx.conf
+            sudo systemctl reload nginx
+          EOF
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # 기존 컨테이너 종료
+      - name: Remove Old Container
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@43.200.3.226 "docker stop $ACTIVE_CONTAINER && docker rm $ACTIVE_CONTAINER"
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
