@@ -2,6 +2,7 @@ package com.toucheese.admin.dto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -28,7 +29,8 @@ public record AdminReservationListResponse (
 	Integer totalPrice,
 	String productName,
 	Integer productPrice,
-	List<SelectAddOptionResponse> selectAddOptions
+	List<SelectAddOptionResponse> selectAddOptions,
+	LocalDateTime reservationCompletedAt
 ) {
 	public static AdminReservationListResponse of(Reservation reservation) {
 		return builder()
@@ -48,6 +50,7 @@ public record AdminReservationListResponse (
 					.map(SelectAddOptionResponse::of)
 					.toList()
 			)
+			.reservationCompletedAt(reservation.getReservationCompletedAt())
 			.build();
 	}
 }
