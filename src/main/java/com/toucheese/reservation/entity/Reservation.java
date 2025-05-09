@@ -67,7 +67,7 @@ public class Reservation {
 	@Enumerated(EnumType.STRING)
 	private ReservationStatus status;
 
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+	@Column(columnDefinition = "datetime")
 	private LocalDateTime reservationCompletedAt;
 
 
