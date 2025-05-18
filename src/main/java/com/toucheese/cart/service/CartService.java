@@ -195,7 +195,8 @@ public class CartService {
 				return new SelectAddOptionResponse(
 					addOption.getId(),
 					addOption.getAddOptionName(),
-					productAddOption.getAddOptionPrice()
+					productAddOption.getAddOptionPrice(),
+					cart.getAddOptPerPerson()
 				);
 			}).toList();
 	}

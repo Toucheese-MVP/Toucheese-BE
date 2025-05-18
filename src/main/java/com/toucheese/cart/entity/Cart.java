@@ -42,6 +42,8 @@ public class Cart {
 
 	private String addOptions;
 
+	private Integer addOptPerPerson;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id")
 	private Product product;
@@ -60,6 +62,9 @@ public class Cart {
 		}
 		if (request.personnel() != null) {
 			this.personnel = request.personnel();
+		}
+		if (request.addOptPerPerson() != null) {
+			this.addOptPerPerson = request.addOptPerPerson();
 		}
 		if (request.addOptions() != null) {
 			this.addOptions = CsvUtils.toCsv(request.addOptions());
@@ -80,6 +85,7 @@ public class Cart {
 			.createTime(cartRequest.createTime())
 			.personnel(cartRequest.personnel())
 			.addOptions(addOptionsCsv)
+			.addOptPerPerson(cartRequest.addOptPerPerson())
 			.build();
 	}
 }

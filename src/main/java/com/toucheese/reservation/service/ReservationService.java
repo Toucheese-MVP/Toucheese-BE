@@ -57,12 +57,7 @@ public class ReservationService {
 				cart.getProduct().getId(), addOptionIds
 			);
 
-			List<ReservationProductAddOption> reservationProductAddOptions = productAddOptions.stream()
-				.map(productAddOption -> new ReservationProductAddOption(productAddOption,
-					productAddOption.getAddOptionPrice()))
-				.collect(Collectors.toList());
-
-			return Reservation.builder()
+			Reservation reservation = Reservation.builder()
 				.product(cart.getProduct())
 				.studio(cart.getStudio())
 				.member(cart.getMember())
@@ -70,10 +65,17 @@ public class ReservationService {
 				.createDate(cart.getCreateDate())
 				.createTime(cart.getCreateTime())
 				.personnel(cart.getPersonnel())
-				.reservationProductAddOptions(reservationProductAddOptions)
 				.status(ReservationStatus.예약접수)
 				.reservationCompletedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
 				.build();
+
+			List<ReservationProductAddOption> reservationProductAddOptions = productAddOptions.stream()
+				.map(productAddOption -> new ReservationProductAddOption(productAddOption,
+					productAddOption.getAddOptionPrice(), reservation))
+				.collect(Collectors.toList());
+
+			reservation.setReservationProductAddOptions(reservationProductAddOptions);
+			return reservation;
 		}).collect(Collectors.toList());
 
 		reservationRepository.saveAll(reservations);
@@ -95,11 +97,23 @@ public class ReservationService {
 		// 회원 정보 조회 및 전화번호 업데이트
 		Member member = getMemberAndUpdatePhone(memberId, reservationRequest.phone());
 
-		// 상품 추가 옵션 조회
-		List<ReservationProductAddOption> reservationProductAddOptions = getReservationProductAddOptions(reservationRequest);
+		// 예약 객체 생성
+		Reservation reservation = Reservation.builder()
+				.product(productService.findProductById(reservationRequest.productId()))
+				.studio(studioService.findStudioById(reservationRequest.studioId()))
+				.member(member)
+				.phone(member.getPhone())
+				.totalPrice(reservationRequest.totalPrice())
+				.createDate(reservationRequest.createDate())
+				.createTime(reservationRequest.createTime())
+				.personnel(reservationRequest.personnel())
+				.addOptPerPerson(reservationRequest.addOptPerPerson())
+				.status(ReservationStatus.예약접수)
+				.reservationCompletedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+				.build();
 
-		// 새로운 예약 생성
-		Reservation reservation = createReservation(reservationRequest, member, reservationProductAddOptions);
+		// 상품 추가 옵션 조회 및 설정
+		getReservationProductAddOptions(reservationRequest, reservation);
 
 		// 예약 저장 및 문자 메시지 전송
 		reservationRepository.save(reservation);
@@ -155,41 +169,23 @@ public class ReservationService {
 
 	// 즉시 예약 메서드(iOS용) - 리팩토링
 	// 예약 요청에 포함된 추가 옵션을 기반으로 예약 상품 추가 옵션 목록을 생성하는 메서드
-	private List<ReservationProductAddOption> getReservationProductAddOptions(ReservationRequest reservationRequest) {
+	private List<ReservationProductAddOption> getReservationProductAddOptions(ReservationRequest reservationRequest, Reservation reservation) {
 		// 상품 추가 옵션 조회
 		List<ProductAddOption> productAddOptions = productService.findProductAddOptionsByProductIdAndAddOptionIds(
 				reservationRequest.productId(), reservationRequest.addOptions()
 		);
 
 		// 예약 상품 추가 옵션 변환
-		return productAddOptions.stream()
+		List<ReservationProductAddOption> reservationProductAddOptions = productAddOptions.stream()
 				.map(productAddOption -> new ReservationProductAddOption(
 						productAddOption,
-						productAddOption.getAddOptionPrice()
+						productAddOption.getAddOptionPrice(),
+						reservation
 				))
 				.collect(Collectors.toList());
-	}
 
-	// 즉시 예약 메서드(iOS용) - 리팩토링
-	// 예약을 생성하는 메서드
-	private Reservation createReservation(ReservationRequest reservationRequest, Member member, List<ReservationProductAddOption> reservationProductAddOptions) {
-		// 예약 객체 생성
-		return Reservation.builder()
-				// 요청된 상품 ID를 사용해 해당 상품 조회 + 예약 객체에 설정
-				.product(productService.findProductById(reservationRequest.productId()))
-				// 요청된 스튜디오 ID를 사용해 해당 스튜디오 조회 + 예약 객체에 설정
-				.studio(studioService.findStudioById(reservationRequest.studioId()))
-				.member(member) // 예약한 회원 정보 설정
-				.phone(member.getPhone()) // 회원의 전화번호 설정
-				.totalPrice(reservationRequest.totalPrice()) // 예약의 총 가격 설정
-				.createDate(reservationRequest.createDate()) // 예약 생성 날짜 설정
-				.createTime(reservationRequest.createTime()) // 예약 생성 시간 설정
-				.personnel(reservationRequest.personnel()) //예약 인원 수 설정
-				.reservationProductAddOptions(reservationProductAddOptions) // 예약 상품 추가 옵션 리스트 설정
-				.status(ReservationStatus.예약접수) // 예약 상태를 '예약 접수'로 설정
-				// 예약 완료 시간을 현재 시간으로 설정
-				.reservationCompletedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
-				.build();
+		reservation.setReservationProductAddOptions(reservationProductAddOptions);
+		return reservationProductAddOptions;
 	}
 
 	// 즉시 예약 메서드(iOS용) - 리팩토링

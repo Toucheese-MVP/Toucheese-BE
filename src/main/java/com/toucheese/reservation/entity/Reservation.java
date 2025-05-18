@@ -47,6 +47,9 @@ public class Reservation {
 
 	private Integer personnel;
 
+	@Column(nullable = true)
+	private Integer addOptPerPerson;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id")
 	private Product product;
