@@ -26,9 +26,13 @@ public class ReservationProductAddOption {
 	@JoinColumn(name = "product_add_option_id", nullable = false)
 	private ProductAddOption productAddOption;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "reservation_id", nullable = false)
+	private Reservation reservation;
 
-		public ReservationProductAddOption(ProductAddOption productAddOption, Integer addPrice) {
-			this.productAddOption = productAddOption;
-			this.addPrice = addPrice;
+	public ReservationProductAddOption(ProductAddOption productAddOption, Integer addPrice, Reservation reservation) {
+		this.productAddOption = productAddOption;
+		this.addPrice = addPrice;
+		this.reservation = reservation;
 	}
 }

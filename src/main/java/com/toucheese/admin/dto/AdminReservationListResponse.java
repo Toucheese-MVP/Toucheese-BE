@@ -29,6 +29,16 @@ public record AdminReservationListResponse (
 	Integer totalPrice,
 	String productName,
 	Integer productPrice,
+	@Schema(description = "선택된 추가 옵션 목록", example = """
+			[
+				{
+					"selectOptionId": 1,
+					"selectOptionName": "헤어",
+					"selectOptionPrice": 10000,
+					"addOptPerPerson": 2
+				}
+			]
+			""")
 	List<SelectAddOptionResponse> selectAddOptions,
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
 	@Schema(type = "string", example = "2025-01-01 19:00")

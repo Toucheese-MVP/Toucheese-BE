@@ -32,6 +32,8 @@ public record ReservationRequest(
         LocalTime createTime,
 		@Schema(description = "인원 수", example = "2")
         Integer personnel,
+        @Schema(description = "인원당 추가 옵션 개수", example = "2")
+        Integer addOptPerPerson,
         @Schema(description = "추가 옵션 ID 목록", example = "[1, 2]")
         List<Long> addOptions
 ) {
@@ -46,6 +48,7 @@ public record ReservationRequest(
                 .createDate(reservation.getCreateDate())
                 .createTime(reservation.getCreateTime())
                 .personnel(reservation.getPersonnel())
+                .addOptPerPerson(reservation.getAddOptPerPerson())
                 .addOptions(reservation.getReservationProductAddOptions() != null ?
                         reservation.getReservationProductAddOptions().stream()
                                 .map(ReservationProductAddOption::getId)

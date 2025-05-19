@@ -23,6 +23,8 @@ public record CartRequest(
 	LocalTime createTime,
 	@NotNull(message = "인원은 필수입니다.")
 	Integer personnel,
+	@Schema(description = "인원당 추가 옵션 개수 (standard가 2인 상품의 경우)", example = "2")
+	Integer addOptPerPerson,
 	List<Long> addOptions
 ) {
 
