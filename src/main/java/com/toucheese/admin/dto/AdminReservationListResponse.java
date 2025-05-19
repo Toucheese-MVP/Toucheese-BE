@@ -30,6 +30,8 @@ public record AdminReservationListResponse (
 	String productName,
 	Integer productPrice,
 	List<SelectAddOptionResponse> selectAddOptions,
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+	@Schema(type = "string", example = "2025-01-01 19:00")
 	LocalDateTime reservationCompletedAt
 ) {
 	public static AdminReservationListResponse of(Reservation reservation) {
