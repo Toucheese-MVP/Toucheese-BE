@@ -192,11 +192,12 @@ public class CartService {
 		return productAddOptions.stream()
 			.map(productAddOption -> {
 				AddOption addOption = addOptionCache.get(productAddOption.getAddOption().getId());
+				Integer addOptPerPerson = cart.getAddOptPerPerson() != null ? cart.getAddOptPerPerson() : 1;
 				return new SelectAddOptionResponse(
 					addOption.getId(),
 					addOption.getAddOptionName(),
 					productAddOption.getAddOptionPrice(),
-					cart.getAddOptPerPerson()
+					addOptPerPerson
 				);
 			}).toList();
 	}
